@@ -29,6 +29,26 @@ export interface FlowerDef {
   lock: number;
 }
 
+/** Caixa por cima do quadro: tapa os blocos de um retângulo até ser partida. */
+export interface BoxDef {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  /** Blocos a recolher MESMO AO LADO da caixa até ela partir */
+  n: number;
+}
+
+/** Cadeado: as peças da cor c não se podem tocar até se ganhar a chave. */
+export interface LockDef {
+  /** Índice da cor bloqueada */
+  c: number;
+  /** Índice da cor da chave */
+  key: number;
+  /** Blocos da cor da chave a recolher para ganhar a chave */
+  n: number;
+}
+
 export interface LevelStats {
   greedyWins: boolean;
   /** Percentagem (0-1) de jogos aleatórios que acabam em derrota */
@@ -50,6 +70,8 @@ export interface LevelData {
   grid: string[];
   stones?: StoneDef[];
   flowers?: FlowerDef[];
+  boxes?: BoxDef[];
+  locks?: LockDef[];
   /** 4 colunas; índice 0 = peça da frente */
   columns: PieceDef[][];
   /** Sequência vencedora (colunas a tocar, cada toque num momento de calma) */

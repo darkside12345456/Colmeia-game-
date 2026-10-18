@@ -8,9 +8,11 @@
 // - Cada peça numa ranhura lança abelhas (uma de LAUNCH_INTERVAL_MS em LAUNCH_INTERVAL_MS);
 //   cada abelha reserva o bloco alcançável mais perto da colmeia, apanha-o (o bloco sai do
 //   quadro) e entrega-o na colmeia (o número da peça desce 1).
+// - Caixas tapam blocos; cada bloco recolhido ao lado de uma caixa desconta 1 e a 0 ela parte-se.
+// - Cadeados: as peças de uma cor só se podem tocar depois de recolher N blocos da cor da chave.
 // - Tudo é guiado por eventos com tempo exato, por isso o resultado não depende dos fps.
 import { Rng } from './rng';
-import { charColor, type LevelData, type PieceDef } from './types';
+import { charColor, type LevelData, type LockDef, type PieceDef } from './types';
 
 export const DEFAULT_SLOTS = 5;
 export const MAX_SLOTS = 7;
@@ -22,6 +24,7 @@ export const KIND_EMPTY = 0;
 export const KIND_BLOCK = 1;
 export const KIND_STONE = 2;
 export const KIND_FLOWER = 3;
+export const KIND_BOX = 4;
 
 export interface RPiece {
   id: number;
@@ -61,13 +64,16 @@ export type EngineEvent =
   | { type: 'pieceDone'; pieceId: number; slot: number }
   | { type: 'stoneBreak'; cell: number }
   | { type: 'flowerOpen'; cell: number }
+  | { type: 'boxHit'; box: number; left: number }
+  | { type: 'boxOpen'; box: number; cells: number[] }
+  | { type: 'lockOpen'; lock: number }
   | { type: 'magnet'; color: number; cells: number[] }
   | { type: 'columnRemove'; pieceId: number; col: number }
   | { type: 'pieceUpdate'; pieceId: number }
   | { type: 'shuffle' }
   | { type: 'slotAdded'; slots: number };
 
-export type TapCheck = 'ok' | 'empty' | 'tube' | 'twinNotFront' | 'noSpace';
+export type TapCheck = 'ok' | 'empty' | 'tube' | 'twinNotFront' | 'noSpace' | 'locked';
 
 const EV_LAUNCH = 0;
 const EV_PICKUP = 1;
@@ -97,6 +103,17 @@ export class GameEngine {
   flowerLock: Int8Array;
   stones: number[] = [];
   flowers: number[] = [];
+  /** Caixas: células de cada caixa e caixas vizinhas de cada célula (imutáveis) */
+  boxCells: number[][] = [];
+  boxNear: number[][] = [];
+  /** Blocos ainda a recolher ao lado de cada caixa (0 = partida) */
+  boxLeft: Int32Array = new Int32Array(0);
+  /** Cadeados (imutáveis), estado aberto e cadeado de cada cor (-1 = nenhum) */
+  locks: LockDef[] = [];
+  lockOpen: Uint8Array = new Uint8Array(0);
+  lockOfColor: Int8Array = new Int8Array(0);
+  /** Blocos de cada cor no início do nível */
+  colorTotal: Int32Array = new Int32Array(0);
   colorRemaining: Int32Array;
   blocksLeft = 0;
   picks = 0;
@@ -134,6 +151,13 @@ export class GameEngine {
       this.flowerLock = clone.flowerLock; // imutável
       this.stones = clone.stones.slice();
       this.flowers = clone.flowers.slice();
+      this.boxCells = clone.boxCells; // imutável
+      this.boxNear = clone.boxNear; // imutável
+      this.boxLeft = clone.boxLeft.slice();
+      this.locks = clone.locks; // imutável
+      this.lockOpen = clone.lockOpen.slice();
+      this.lockOfColor = clone.lockOfColor; // imutável
+      this.colorTotal = clone.colorTotal; // imutável
       this.colorRemaining = clone.colorRemaining.slice();
       this.blocksLeft = clone.blocksLeft;
       this.picks = clone.picks;
@@ -201,6 +225,42 @@ export class GameEngine {
       this.flowerLock[i] = f.lock;
       this.flowers.push(i);
     }
+    this.colorTotal = this.colorRemaining.slice();
+    this.boxNear = Array.from({ length: n }, () => []);
+    (level.boxes ?? []).forEach((b, k) => {
+      const cells: number[] = [];
+      for (let y = b.y; y < b.y + b.h; y++) {
+        for (let x = b.x; x < b.x + b.w; x++) {
+          const i = y * w + x;
+          if (x >= w || y >= h || this.kind[i] !== KIND_BLOCK) throw new Error(`Nível ${level.id}: caixa fora de blocos normais`);
+          this.kind[i] = KIND_BOX;
+          cells.push(i);
+        }
+      }
+      // vizinhos (4 lados) fora da caixa
+      const near = new Set<number>();
+      for (const i of cells) {
+        const x = i % w;
+        const y = (i / w) | 0;
+        for (const [nx, ny] of [
+          [x - 1, y],
+          [x + 1, y],
+          [x, y - 1],
+          [x, y + 1],
+        ]) {
+          if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+          const j = ny * w + nx;
+          if (!cells.includes(j)) near.add(j);
+        }
+      }
+      for (const j of near) this.boxNear[j].push(k);
+      this.boxCells.push(cells);
+    });
+    this.boxLeft = Int32Array.from((level.boxes ?? []).map((b) => b.n));
+    this.locks = (level.locks ?? []).map((l) => ({ ...l }));
+    this.lockOpen = new Uint8Array(this.locks.length);
+    this.lockOfColor = new Int8Array(this.colorCount).fill(-1);
+    this.locks.forEach((l, k) => (this.lockOfColor[l.c] = k));
 
     // Distâncias à entrada da colmeia (por baixo do quadro, ao centro)
     const hx = (w - 1) / 2;
@@ -326,6 +386,18 @@ export class GameEngine {
     return p.remaining - p.inFlight;
   }
 
+  /** Blocos da cor da chave já recolhidos para o cadeado k. */
+  keyProgress(k: number): number {
+    const l = this.locks[k];
+    return Math.min(l.n, this.colorTotal[l.key] - this.colorRemaining[l.key]);
+  }
+
+  /** A peça é de uma cor com cadeado ainda fechado? */
+  isLocked(p: RPiece): boolean {
+    const k = this.lockOfColor[p.color];
+    return k >= 0 && this.lockOpen[k] === 0;
+  }
+
   stoneLeft(i: number): number {
     return Math.max(0, this.stoneNeed[i] - this.picks);
   }
@@ -344,6 +416,7 @@ export class GameEngine {
     if (front === undefined) return 'empty';
     const p = this.pieces.get(front)!;
     if (p.tubeParent >= 0) return 'tube';
+    if (this.isLocked(p) || (p.twin >= 0 && this.isLocked(this.pieces.get(p.twin)!))) return 'locked';
     const free = this.freeSlots();
     if (p.twin >= 0) {
       if (!this.columns.some((c, i) => i !== col && c[0] === p.twin)) return 'twinNotFront';
@@ -423,6 +496,7 @@ export class GameEngine {
   canTweezers(pieceId: number): boolean {
     const p = this.pieces.get(pieceId);
     if (!p || this.columnOf(pieceId) < 0) return false;
+    if (this.isLocked(p) || (p.twin >= 0 && this.isLocked(this.pieces.get(p.twin)!))) return false;
     const need = p.twin >= 0 && this.columnOf(p.twin) >= 0 ? 2 : 1;
     return this.freeSlots() >= need;
   }
@@ -752,6 +826,22 @@ export class GameEngine {
           this.flowers.splice(k, 1);
           this.emit({ type: 'flowerOpen', cell: fi });
         }
+      }
+    }
+    for (const b of this.boxNear[i]) {
+      if (this.boxLeft[b] <= 0) continue;
+      this.boxLeft[b]--;
+      this.emit({ type: 'boxHit', box: b, left: this.boxLeft[b] });
+      if (this.boxLeft[b] === 0) {
+        for (const j of this.boxCells[b]) this.kind[j] = KIND_BLOCK;
+        this.emit({ type: 'boxOpen', box: b, cells: this.boxCells[b] });
+      }
+    }
+    for (let k = 0; k < this.locks.length; k++) {
+      if (this.lockOpen[k] || this.locks[k].key !== c) continue;
+      if (this.colorTotal[c] - this.colorRemaining[c] >= this.locks[k].n) {
+        this.lockOpen[k] = 1;
+        this.emit({ type: 'lockOpen', lock: k });
       }
     }
   }

@@ -76,5 +76,44 @@ export function validateLevel(level: LevelData): string[] {
     if (c === f.lock) err('flor fechada pela própria cor');
     if (lockColors.has(c)) err('flor de uma cor que também fecha flores (pode bloquear)');
   }
+  // caixas: só sobre blocos normais, sem se tocarem, e com vizinhos suficientes para partir
+  const special = new Set([...(level.stones ?? []), ...(level.flowers ?? [])].map((o) => `${o.x},${o.y}`));
+  const boxAt = new Map<string, number>();
+  (level.boxes ?? []).forEach((b, k) => {
+    if (b.w < 1 || b.h < 1 || b.x < 0 || b.y < 0 || b.x + b.w > level.w || b.y + b.h > level.h) err(`caixa ${k} fora do quadro`);
+    for (let y = b.y; y < b.y + b.h; y++)
+      for (let x = b.x; x < b.x + b.w; x++) {
+        if (cellAt(x, y) < 0) err(`caixa ${k} sobre célula vazia (${x},${y})`);
+        if (special.has(`${x},${y}`)) err(`caixa ${k} sobre pedra ou flor`);
+        if (boxAt.has(`${x},${y}`)) err(`caixas ${boxAt.get(`${x},${y}`)} e ${k} sobrepostas`);
+        boxAt.set(`${x},${y}`, k);
+      }
+  });
+  (level.boxes ?? []).forEach((b, k) => {
+    let around = 0;
+    for (let y = b.y - 1; y <= b.y + b.h; y++)
+      for (let x = b.x - 1; x <= b.x + b.w; x++) {
+        const inside = x >= b.x && x < b.x + b.w && y >= b.y && y < b.y + b.h;
+        const side = (x >= b.x && x < b.x + b.w) || (y >= b.y && y < b.y + b.h);
+        if (inside || !side) continue;
+        const other = boxAt.get(`${x},${y}`);
+        if (other !== undefined) err(`caixas ${k} e ${other} encostadas (podem bloquear-se)`);
+        else if (cellAt(x, y) >= 0) around++;
+      }
+    if (b.n <= 0 || b.n > around) err(`caixa ${k} pede ${b.n} blocos mas só tem ${around} à volta`);
+  });
+  // cadeados: cor válida, chave de outra cor, sem cadeias, e peças da cor sem gémeas/tubos
+  const locked = new Set<number>();
+  const childOf = new Set(level.columns.flat().filter((p) => p.tube !== undefined).map((p) => p.tube));
+  for (const l of level.locks ?? []) {
+    if (l.c < 0 || l.c >= level.colors.length || l.key < 0 || l.key >= level.colors.length) err('cadeado com cor inválida');
+    if (l.c === l.key) err('cadeado aberto pela própria cor');
+    if (locked.has(l.c)) err('duas fechaduras na mesma cor');
+    locked.add(l.c);
+    if (l.n <= 0 || l.n > (blocks[l.key] ?? 0)) err(`cadeado pede ${l.n} blocos da chave mas só há ${blocks[l.key]}`);
+    for (const p of level.columns.flat())
+      if (p.c === l.c && (p.twin !== undefined || p.tube !== undefined || childOf.has(p.id))) err(`peça ${p.id} com cadeado não pode ser gémea nem tubo`);
+  }
+  for (const l of level.locks ?? []) if (locked.has(l.key)) err('a cor da chave também está fechada (cadeia de cadeados)');
   return errors;
 }

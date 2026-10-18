@@ -3,6 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { classify } from '../src/core/generator';
 import { countBlocks, countPieces, validateLevel } from '../src/core/level';
+import { GameEngine } from '../src/core/engine';
 import { clearsWithAllPieces, replay } from '../src/core/solver';
 import type { LevelData } from '../src/core/types';
 
@@ -42,8 +43,29 @@ describe('níveis', () => {
     }
   });
 
-  it('pedras e flores nunca bloqueiam o quadro para sempre', () => {
-    for (const l of levels.filter((x) => x.stones || x.flowers)) expect(clearsWithAllPieces(l), `nível ${l.id}`).toBe(true);
+  it('cada quadrado é levado por exatamente uma abelha (abelhas = blocos = números das peças)', () => {
+    for (const l of levels) {
+      const e = new GameEngine(l);
+      const launched = new Array(l.colors.length).fill(0);
+      const delivered = new Array(l.colors.length).fill(0);
+      const count = (events: ReturnType<GameEngine['flush']>) => {
+        for (const ev of events) {
+          if (ev.type === 'launch') launched[ev.bee.color]++;
+          if (ev.type === 'deliver') delivered[ev.bee.color]++;
+        }
+      };
+      for (const c of l.solution!) {
+        count(e.runToQuiescence());
+        e.tap(c);
+      }
+      count(e.runToQuiescence());
+      expect(launched, `nível ${l.id}`).toEqual(countBlocks(l));
+      expect(delivered, `nível ${l.id}`).toEqual(countPieces(l));
+    }
+  });
+
+  it('pedras, flores e caixas nunca bloqueiam o quadro para sempre', () => {
+    for (const l of levels.filter((x) => x.stones || x.flowers || x.boxes)) expect(clearsWithAllPieces(l), `nível ${l.id}`).toBe(true);
   });
 
   it('a etiqueta de dificuldade corresponde às medições do solver', () => {
@@ -58,6 +80,8 @@ describe('níveis', () => {
       if (l.id < 31) expect(l.stones).toBeUndefined();
       if (l.id < 41) expect(pieces.some((p) => p.hidden)).toBe(false);
       if (l.id < 61) expect(l.flowers).toBeUndefined();
+      if (l.id < 81) expect(l.boxes).toBeUndefined();
+      if (l.id < 101) expect(l.locks).toBeUndefined();
     }
   });
 });
