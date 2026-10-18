@@ -152,6 +152,95 @@ try {
     });
   });
 
+  await step('anúncios falsos: ver até ao fim dá prémio, fechar antes não dá', async () => {
+    const full = page.evaluate(() => window.__app.rewarded('short', 'teste'));
+    await wait(3600);
+    await page.click('.cd-ov .x');
+    if ((await full) !== true) throw new Error('anúncio visto até ao fim não deu prémio');
+    const early = page.evaluate(() => window.__app.rewarded('long', 'teste'));
+    await wait(1200);
+    await shot('16-anuncio-teste');
+    await page.click('.cd-ov .x');
+    if ((await early) !== false) throw new Error('anúncio fechado antes do fim deu prémio');
+  });
+
+  await step('compras falsas: moedas, Sem anúncios e restaurar', async () => {
+    const before = await page.evaluate(() => window.__app.save.coins);
+    const buy = page.evaluate(() => window.__app.buy('coins_s'));
+    await wait(500);
+    await shot('17-compra-teste');
+    await page.click('.cd-ov .ok');
+    if ((await buy).status !== 'ok') throw new Error('compra falhou');
+    const after = await page.evaluate(() => window.__app.save.coins);
+    if (after !== before + 1000) throw new Error(`moedas ${before} -> ${after}`);
+    const cancel = page.evaluate(() => window.__app.buy('coins_m'));
+    await wait(400);
+    await page.click('.cd-ov .no');
+    if ((await cancel).status !== 'cancelled') throw new Error('cancelar não funcionou');
+    const noAds = page.evaluate(() => window.__app.buy('no_ads'));
+    await wait(400);
+    await page.click('.cd-ov .ok');
+    await noAds;
+    if (!(await page.evaluate(() => window.__app.noAds()))) throw new Error('Sem anúncios não ficou ativo');
+    // apagar o save local: o "Sem anúncios" volta com Restaurar compras
+    const r = await page.evaluate(async () => {
+      window.__app.save.purchases.noAdsCache = false;
+      return window.__app.restore();
+    });
+    if (!r.ok || r.restored < 1) throw new Error('restaurar compras não devolveu o Sem anúncios');
+  });
+
+  await step('reforços, sem espaço, continuar, falhar e pausa (nível 25)', async () => {
+    await page.evaluate(async () => {
+      const s = window.__app.save;
+      s.level = 25;
+      s.coins = 5000;
+      for (const k of ['slot', 'shuffle', 'tweezers', 'magnet']) {
+        s.boostersIntroduced[k] = true;
+        s.boosters[k] = 2;
+      }
+      for (const k of ['twins', 'tubes', 'stones', 'hidden', 'flowers']) s.seen['obs_' + k] = true;
+      const { loadLevel } = await import('/src/levels.ts');
+      window.__game.scene.getScenes(true)[0].scene.start('Game', { level: await loadLevel(25) });
+    });
+    await page.waitForFunction(() => window.__game.scene.getScene('Game')?.state === 'play', null, { timeout: 60000 });
+    const res = await page.evaluate(() => {
+      const g = window.__game.scene.getScene('Game');
+      const out = {};
+      g.onBooster('slot');
+      out.slots = g.engine.capacity;
+      g.onBooster('shuffle');
+      g.onBooster('tweezers');
+      out.mode = g.mode;
+      const back = [...g.views.values()].find((v) => g.engine.slotOf(v.id) < 0 && g.engine.columns[g.engine.columnOf(v.id)]?.[0] !== v.id && g.engine.pieces.get(v.id).twin < 0);
+      if (back) back.img.emit('pointerdown');
+      out.tweezersInTray = back ? g.engine.slotOf(back.id) >= 0 : 'sem peça de trás';
+      g.openMagnetChooser();
+      const chip = g.magnetChips?.list.find((o) => o.type === 'Image');
+      const left = g.engine.blocksLeft;
+      chip?.emit('pointerdown');
+      out.magnetCollected = left - g.engine.blocksLeft;
+      out.boosters = { ...window.__app.save.boosters };
+      return out;
+    });
+    console.log('    ', JSON.stringify(res));
+    if (res.slots !== 6 || res.mode !== 'tweezers' || res.tweezersInTray !== true || !(res.magnetCollected > 0)) throw new Error('reforços: ' + JSON.stringify(res));
+    await wait(1500);
+    await shot('18-reforcos');
+    await page.evaluate(() => window.__game.scene.getScene('Game').onBlocked());
+    await wait(900);
+    await shot('19-sem-espaco');
+    await page.evaluate(async () => {
+      const { closeTopModal } = await import('/src/ui/Modal.ts');
+      const g = window.__game.scene.getScene('Game');
+      closeTopModal(g); // fechar = desistir -> nível falhado
+    });
+    await wait(900);
+    await shot('20-nivel-falhado');
+    const lives = await page.evaluate(() => window.__app.save.lives);
+    if (lives !== 4) throw new Error(`vidas depois de falhar: ${lives}`);
+  });
+
   await step('acelerar 2x e jogo grande (nível 280)', async () => {
     await page.evaluate(async () => {
       const { loadLevel } = await import('/src/levels.ts');

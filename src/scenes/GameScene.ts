@@ -130,7 +130,7 @@ export class GameScene extends BaseScene {
     this.buildTop();
     this.buildBoard();
     this.buildTray();
-    this.links = this.add.graphics().setDepth(40);
+    this.links = this.add.graphics().setDepth(26);
     this.renderColumns(false);
     this.buildBoosters();
     this.fadeIn();

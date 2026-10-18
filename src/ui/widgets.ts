@@ -256,9 +256,15 @@ export class ScrollArea extends Phaser.GameObjects.Container {
 
   /** Atualiza a máscara (chamar depois de posicionar a área no ecrã). */
   updateMask(): void {
-    // coordenadas do mundo (a câmara aplica o zoom à máscara)
-    const m = this.getWorldTransformMatrix();
-    this.maskG.clear().fillStyle(0xffffff).fillRect(m.tx - this.aw / 2, m.ty - this.ah / 2, this.aw, this.ah);
+    // posição final no mundo (ignora a escala da animação de entrada da janela)
+    let x = this.x;
+    let y = this.y;
+    for (let p = this.parentContainer; p; p = p.parentContainer) {
+      x += p.x;
+      y += p.y;
+    }
+    // coordenadas do mundo (a câmara aplica o zoom à máscara - verificado com zoom 1 e 1,5)
+    this.maskG.clear().fillStyle(0xffffff).fillRect(x - this.aw / 2, y - this.ah / 2, this.aw, this.ah);
     this.content.setMask(this.maskG.createGeometryMask());
   }
 

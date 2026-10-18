@@ -12,7 +12,8 @@ const PATTERNS = [
   { name: 'Chave API Google (AIza)', re: /\bAIza[0-9A-Za-z_-]{35}\b/ },
   { name: 'Token GitHub', re: /\bgh[pousr]_[A-Za-z0-9]{36,}\b/ },
   { name: 'Chave AWS', re: /\bAKIA[0-9A-Z]{16}\b/ },
-  { name: 'Password de keystore', re: /(storePassword|keyPassword)\s*[=:]\s*['"]?[^\s'"$]{4,}/ },
+  // valor real na mesma linha (ignora linhas vazias e marcadores {{...}} da documentação)
+  { name: 'Password de keystore', re: /(storePassword|keyPassword)[ \t]*[=:][ \t]*['"]?(?!\{\{)[^\s'"$]{4,}/ },
 ];
 const FORBIDDEN_FILES = [/\.jks$/, /\.keystore$/, /(^|\/)key\.properties$/, /(^|\/)\.env$/, /\.p12$/, /google-services\.json$/];
 const SKIP = [/^package-lock\.json$/, /\.png$/, /\.woff2?$/, /\.ico$/, /^tools\/check-secrets\.mjs$/, /^\.gitleaks\.toml$/];

@@ -58,7 +58,9 @@ export class HomeScene extends BaseScene {
     this.add.image(0, 0, gardenTexture(this, L.W, L.H)).setOrigin(0, 0);
     this.clouds();
     pollen(this, 4);
-    this.add.existing(hiveView(this, 140, L.H * 0.66, app.save.hive.stage, 0.62));
+    // a colmeia do jogador fica entre a Mel e o botão Jogar (mais pequena em ecrãs baixos)
+    const small = L.H < 1400;
+    this.add.existing(hiveView(this, 120, L.H - (small ? 470 : 560), app.save.hive.stage, small ? 0.46 : 0.6));
     this.heroBee();
     this.topBar();
     this.buildEvents();

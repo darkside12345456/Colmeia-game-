@@ -93,7 +93,7 @@ export function shopModal(scene: Phaser.Scene): void {
     buyBtn(190, top + 75, id, 190);
   });
   area.setContentHeight(y + 10);
-  scene.time.delayedCall(320, () => area.updateMask());
+  area.updateMask();
 
   m.addContent(
     new Button(scene, 0, h / 2 - 150, {

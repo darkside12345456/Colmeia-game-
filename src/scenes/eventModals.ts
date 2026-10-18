@@ -204,7 +204,7 @@ export function passModal(scene: Phaser.Scene, onChange?: () => void): void {
   }
   area.setContentHeight(PASS_TIERS * rowH);
   area.scrollTo(Math.max(0, (tier - 1) * rowH));
-  scene.time.delayedCall(320, () => area.updateMask());
+  area.updateMask();
 }
 
 // ------------------------------------------------------------------ 3. Tesouro da Rainha
@@ -279,7 +279,7 @@ export function treasureModal(scene: Phaser.Scene, onChange?: () => void): void 
   if (!currentTreasureStep(s, app.now())) m.addContent(txt(scene, 0, h / 2 - 60, t('treasure.done'), 26, { body: true, wrap: 560 }));
   area.setContentHeight(TREASURE_STEPS.length * stepH + 40);
   area.scrollTo(Math.max(0, (s.treasure.step - 1) * stepH));
-  scene.time.delayedCall(320, () => area.updateMask());
+  area.updateMask();
 }
 
 // ------------------------------------------------------------------ 4. Corrida das Flores
