@@ -300,5 +300,8 @@
     "fakeTitle": "Compra de teste",
     "fakeNote": "Nenhum pagamento real é feito.",
     "confirm": "Confirmar"
+  },
+  "test": {
+    "level": "Teste: nível {n}"
   }
 }

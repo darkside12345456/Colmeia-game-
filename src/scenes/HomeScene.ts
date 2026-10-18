@@ -67,6 +67,24 @@ export class HomeScene extends BaseScene {
     this.buildEvents();
     this.playButton();
     this.bottomBar();
+    // só na página web de testes (npm run build:web): atalhos para experimentar os desafios novos
+    // (dentro do if para a build de lançamento não levar este código)
+    if (import.meta.env.MODE === 'web') {
+      [81, 101, 104].forEach((n, i) => {
+        new Button(this, L.W / 2 + (i - 1) * 156, 150, {
+          w: 148,
+          h: 54,
+          color: COLORS.glass,
+          label: t('test.level', { n }),
+          fontSize: 22,
+          onClick: () => {
+            app.save.level = n;
+            app.persist();
+            this.scene.restart();
+          },
+        });
+      });
+    }
     this.fadeIn();
     const off = app.onChange(() => this.refreshEvents());
     const ev = this.time.addEvent({ delay: 1000, loop: true, callback: () => this.refreshEvents() });
