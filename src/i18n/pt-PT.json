@@ -1,0 +1,298 @@
+{
+  "common": {
+    "ok": "OK",
+    "close": "Fechar",
+    "cancel": "Cancelar",
+    "claim": "Reclamar",
+    "claimed": "Reclamado",
+    "play": "Jogar",
+    "level": "Nível {n}",
+    "free": "Grátis",
+    "watchVideo": "Ver vídeo",
+    "buy": "Comprar",
+    "continue": "Continuar",
+    "retry": "Tentar outra vez",
+    "home": "Início",
+    "back": "Voltar",
+    "loading": "A carregar",
+    "comingSoon": "Em breve",
+    "comingSoonText": "Estamos a preparar esta parte com muito carinho.",
+    "rules": "Regras",
+    "full": "Cheias",
+    "endsIn": "Acaba em {time}",
+    "locked": "Desbloqueia no nível {n}",
+    "noVideo": "Não há vídeos disponíveis agora. Tenta mais tarde.",
+    "notEnoughCoins": "Moedas insuficientes",
+    "yes": "Sim",
+    "no": "Não"
+  },
+  "time": {
+    "dh": "{d}d {h}h",
+    "hm": "{h}h {m}m",
+    "ms": "{m}:{s}"
+  },
+  "difficulty": {
+    "normal": "Normal",
+    "hard": "Difícil",
+    "veryHard": "Muito difícil"
+  },
+  "game": {
+    "pause": "Pausa",
+    "resume": "Continuar",
+    "quit": "Sair do nível",
+    "quitWarn": "Se saíres agora perdes 1 vida.",
+    "twinNotFront": "A gémea também tem de estar à frente",
+    "tube": "Esta peça sobe pelo tubo",
+    "noSpace": "A bandeja está cheia",
+    "noSpaceTwin": "As gémeas precisam de 2 ranhuras livres",
+    "combo1": "Boa!",
+    "combo2": "Fantástico!",
+    "combo3": "Incrível!",
+    "combo4": "Espetacular!",
+    "pickColor": "Escolhe uma cor",
+    "pickPiece": "Toca numa peça para a tirar",
+    "noReach": "Nenhuma cor tem blocos alcançáveis",
+    "speedOn": "2x ligado",
+    "speedOff": "2x pausado"
+  },
+  "boosters": {
+    "slot": "+1 Ranhura",
+    "shuffle": "Baralhar",
+    "tweezers": "Pinça",
+    "magnet": "Flor-íman",
+    "slotDesc": "Ganhas uma 6.ª ranhura até ao fim do nível.",
+    "shuffleDesc": "Reorganiza as peças nas colunas.",
+    "tweezersDesc": "Tira qualquer peça para a bandeja, mesmo uma de trás.",
+    "magnetDesc": "O enxame recolhe na hora todos os blocos alcançáveis de uma cor.",
+    "newTitle": "Novo reforço!",
+    "gift": "Tens {n} grátis para experimentar.",
+    "buyTitle": "Mais {name}",
+    "buyCoins": "{price}",
+    "videoLeft": "Ver vídeo ({n} hoje)",
+    "noVideosLeft": "Já viste os vídeos de hoje para este reforço.",
+    "maxSlots": "Já tens o máximo de ranhuras",
+    "lockedAt": "Nível {n}"
+  },
+  "speed": {
+    "title": "Acelerar 2x",
+    "desc": "As abelhas voam ao dobro da velocidade durante {min} minutos de jogo.",
+    "short": "Ver {n} anúncios curtos",
+    "shortProgress": "{w} de {n} vistos",
+    "long": "Ver 1 anúncio longo",
+    "or": "ou",
+    "left": "Tempo 2x guardado: {time}",
+    "note": "O tempo só conta enquanto jogas com o 2x ligado. Toca no botão 2x para ligar ou pausar.",
+    "limit": "Já usaste o máximo de hoje. Volta amanhã!",
+    "full": "Já tens o máximo de tempo 2x guardado.",
+    "activated": "2x ativado!",
+    "oneMore": "Falta 1 anúncio curto"
+  },
+  "win": {
+    "title": "Muito bem!",
+    "double": "x2 moedas",
+    "next": "Continuar"
+  },
+  "fail": {
+    "title": "Nível falhado",
+    "lifeLost": "Perdeste 1 vida",
+    "infinite": "Tens vidas infinitas, não perdeste nada!"
+  },
+  "nospace": {
+    "title": "Sem espaço",
+    "text": "A bandeja está cheia e nenhuma abelha consegue avançar.",
+    "video": "Ver vídeo: +1 ranhura",
+    "continue": "Continuar: +1 ranhura",
+    "pass": "Revive já com o Passe",
+    "passFree": "Reviver grátis (Passe)",
+    "giveUp": "Desistir"
+  },
+  "nolives": {
+    "title": "Sem vidas",
+    "next": "Próxima vida em {time}",
+    "video": "Ver vídeo: +1 vida",
+    "text": "As abelhas estão a descansar. Volta daqui a pouco!"
+  },
+  "home": {
+    "play": "Jogar",
+    "levelCube": "NÍVEL {n}",
+    "shop": "Loja",
+    "ranking": "Rankings",
+    "home": "Início",
+    "team": "Equipa",
+    "collection": "Coleção",
+    "settings": "Definições"
+  },
+  "events": {
+    "daily": "Prémio diário",
+    "pass": "Passe",
+    "treasure": "Tesouro",
+    "race": "Corrida",
+    "sunflower": "Girassol",
+    "hive": "Colmeia"
+  },
+  "shop": {
+    "title": "Loja",
+    "coins": "Moedas",
+    "noAds": "Sem anúncios",
+    "noAdsDesc": "Remove os anúncios entre níveis e o banner. Os vídeos com prémio continuam disponíveis, se quiseres.",
+    "starter": "Pack inicial",
+    "starterDesc": "Só aparece uma vez!",
+    "restore": "Restaurar compras",
+    "restored": "Compras restauradas.",
+    "nothingToRestore": "Não encontrámos compras para restaurar.",
+    "owned": "Já tens",
+    "unavailable": "A loja não está disponível agora. Verifica a ligação à internet.",
+    "thanks": "Obrigado pela compra!",
+    "failed": "A compra não foi concluída.",
+    "priceNote": "Preços com IVA incluído. Pagamento seguro pela Google Play.",
+    "contains": "Contém:"
+  },
+  "products": {
+    "no_ads": "Sem anúncios",
+    "starter_pack": "Pack inicial",
+    "coins_s": "Punhado de moedas",
+    "coins_m": "Saco de moedas",
+    "coins_l": "Pote de moedas",
+    "coins_xl": "Baú de moedas",
+    "pass_season": "Passe da Colmeia Premium",
+    "treasure_1": "Oferta do Tesouro",
+    "treasure_2": "Oferta do Tesouro",
+    "treasure_3": "Oferta do Tesouro"
+  },
+  "reward": {
+    "coins": "{n} moedas",
+    "infinite": "{m} min de vidas infinitas",
+    "speed": "{m} min a 2x",
+    "booster": "{n}x {name}",
+    "lives": "{n} vidas",
+    "got": "Recebeste!"
+  },
+  "settings": {
+    "title": "Definições",
+    "sound": "Som",
+    "music": "Música",
+    "vibration": "Vibração",
+    "language": "Idioma",
+    "reducedMotion": "Reduzir movimento",
+    "privacy": "Privacidade e anúncios",
+    "privacyPolicy": "Política de privacidade",
+    "restore": "Restaurar compras",
+    "support": "Suporte",
+    "credits": "Créditos e licenças",
+    "version": "Versão {v}",
+    "langName": "Português",
+    "on": "Ligado",
+    "off": "Desligado"
+  },
+  "credits": {
+    "title": "Créditos e licenças",
+    "text": "Colmeia Doce - jogo original. Arte, personagens, sons e música feitos por código para este jogo.\n\nLetras: Baloo 2 e Nunito (SIL Open Font License 1.1).\nMotor de jogo: Phaser (licença MIT).\nApp: Capacitor (licença MIT).\nAnúncios: Google Mobile Ads / AdMob (termos da Google).\nCompras: RevenueCat (licença MIT do SDK).\n\nTextos completos das licenças em licenses/ no código do jogo."
+  },
+  "daily": {
+    "title": "Prémio diário",
+    "day": "Dia {n}",
+    "double": "Ver vídeo: x2",
+    "comeBack": "Volta amanhã para o próximo prémio!",
+    "rules": "Podes reclamar um prémio por dia. São 7 dias e depois o ciclo recomeça. Ver um vídeo (opcional) duplica o prémio do dia."
+  },
+  "pass": {
+    "title": "Passe da Colmeia",
+    "free": "Grátis",
+    "premium": "Premium",
+    "buy": "Desbloquear Premium",
+    "tickets": "{n} bilhetes",
+    "tier": "{n}",
+    "owned": "Premium ativo",
+    "rules": "Ganha níveis para juntar bilhetes (Normal 1, Difícil 2, Muito difícil 3). A cada 3 bilhetes sobes um patamar e podes reclamar o prémio. A faixa Premium (compra opcional, válida até ao fim desta temporada de 28 dias) tem prémios maiores e dá 1 reviver grátis por nível quando ficas sem espaço."
+  },
+  "treasure": {
+    "title": "Tesouro da Rainha",
+    "rules": "Reclama os prémios por ordem: cada um desbloqueia o seguinte. Há passos grátis, passos com vídeo (opcional) e passos pagos (com o preço sempre indicado). O tesouro recomeça a cada 2 dias.",
+    "done": "Já reclamaste todo o tesouro. Volta quando recomeçar!",
+    "step": "Passo {n}"
+  },
+  "race": {
+    "title": "Corrida das Flores",
+    "start": "Começar corrida",
+    "you": "Tu",
+    "won": "Ganhaste a corrida!",
+    "lost": "Desta vez outra abelha chegou primeiro.",
+    "expired": "O tempo da corrida acabou.",
+    "open": "Abrir baú",
+    "close": "Nova corrida",
+    "goal": "Ganha {n} níveis seguidos à primeira tentativa",
+    "rules": "Corre contra 4 abelhas rivais. Quem ganhar primeiro 5 níveis seguidos à primeira tentativa leva o baú grande. Se falhares um nível, voltas ao início. A corrida dura 24 horas. Os rivais são abelhas controladas pelo jogo, não são jogadores reais."
+  },
+  "sunflower": {
+    "title": "Subida ao Girassol",
+    "steps": "{n} passos",
+    "rules": "Cada nível ganho é um passo na subida do girassol. Ao chegares a cada marco recebes um presente. A subida recomeça todas as semanas."
+  },
+  "hive": {
+    "title": "Construir a Colmeia",
+    "rules": "Completa tarefas para ganhar materiais. Quando terminares todas as tarefas de uma etapa, a tua colmeia fica mais bonita no ecrã inicial.",
+    "complete": "Decorar a colmeia",
+    "allDone": "A tua colmeia está completa! Que linda!",
+    "stage": "Etapa {n} de {m}",
+    "stages": {
+      "base": "Base de cera",
+      "porta": "Porta florida",
+      "telhado": "Telhado de folhas",
+      "jardim": "Jardim de flores",
+      "bandeira": "Bandeira da Rainha"
+    },
+    "tasks": {
+      "win": "Ganha {n} níveis",
+      "winHard": "Ganha {n} níveis difíceis",
+      "booster": "Usa {n} reforços",
+      "daily": "Reclama {n} prémios diários",
+      "race": "Ganha {n} corridas",
+      "blocks": "Recolhe {n} blocos",
+      "sunflower": "Reclama {n} presentes do girassol"
+    },
+    "materials": {
+      "cera": "Cera",
+      "petala": "Pétala",
+      "galho": "Galho",
+      "folha": "Folha"
+    }
+  },
+  "starter": {
+    "title": "Pack inicial",
+    "text": "Uma ajuda doce para começares bem. Só aparece uma vez!",
+    "later": "Agora não"
+  },
+  "tutorial": {
+    "tap": "Toca numa peça da fila da frente",
+    "bees": "As abelhas recolhem os blocos dessa cor, de fora para dentro",
+    "tray": "Cuidado: só tens 5 ranhuras. Escolhe bem!",
+    "twins": "Peças gémeas",
+    "twinsText": "Estão unidas por uma barra: entram juntas e precisam de 2 ranhuras livres.",
+    "tubes": "Peças-tubo",
+    "tubesText": "Quando a peça da frente chega a 0, a peça de trás sobe pelo tubo e ocupa logo a mesma ranhura.",
+    "stones": "Pedra de cera",
+    "stonesText": "O número desce 1 por cada bloco recolhido. Quando chega a 0, a pedra parte-se e liberta o bloco.",
+    "hidden": "Peças escondidas",
+    "hiddenText": "Mostram \"?\" até chegarem à fila da frente.",
+    "flowers": "Flores fechadas",
+    "flowersText": "Só abrem quando a cor indicada for toda recolhida do quadro.",
+    "gotIt": "Percebi!"
+  },
+  "ads": {
+    "fakeTitle": "Anúncio de teste",
+    "fakeShort": "Anúncio curto",
+    "fakeLong": "Anúncio longo",
+    "fakeDone": "Prémio ganho! Podes fechar.",
+    "rewardIn": "Prémio em {s} s",
+    "fakeInterstitial": "Intersticial de teste",
+    "fakeBanner": "BANNER DE TESTE",
+    "fakeConsentTitle": "Privacidade (teste)",
+    "fakeConsentText": "Na app real aparece aqui o formulário de consentimento da Google (UMP)."
+  },
+  "iap": {
+    "fakeTag": "MODO DE TESTES",
+    "fakeTitle": "Compra de teste",
+    "fakeNote": "Nenhum pagamento real é feito.",
+    "confirm": "Confirmar"
+  }
+}

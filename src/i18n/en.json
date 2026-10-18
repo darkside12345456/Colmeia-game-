@@ -1,0 +1,298 @@
+{
+  "common": {
+    "ok": "OK",
+    "close": "Close",
+    "cancel": "Cancel",
+    "claim": "Claim",
+    "claimed": "Claimed",
+    "play": "Play",
+    "level": "Level {n}",
+    "free": "Free",
+    "watchVideo": "Watch video",
+    "buy": "Buy",
+    "continue": "Continue",
+    "retry": "Try again",
+    "home": "Home",
+    "back": "Back",
+    "loading": "Loading",
+    "comingSoon": "Coming soon",
+    "comingSoonText": "We are preparing this part with lots of love.",
+    "rules": "Rules",
+    "full": "Full",
+    "endsIn": "Ends in {time}",
+    "locked": "Unlocks at level {n}",
+    "noVideo": "No videos available right now. Try again later.",
+    "notEnoughCoins": "Not enough coins",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "time": {
+    "dh": "{d}d {h}h",
+    "hm": "{h}h {m}m",
+    "ms": "{m}:{s}"
+  },
+  "difficulty": {
+    "normal": "Normal",
+    "hard": "Hard",
+    "veryHard": "Very hard"
+  },
+  "game": {
+    "pause": "Pause",
+    "resume": "Resume",
+    "quit": "Leave level",
+    "quitWarn": "If you leave now you lose 1 life.",
+    "twinNotFront": "The twin must also be at the front",
+    "tube": "This piece comes up through the tube",
+    "noSpace": "The tray is full",
+    "noSpaceTwin": "Twins need 2 free slots",
+    "combo1": "Nice!",
+    "combo2": "Fantastic!",
+    "combo3": "Amazing!",
+    "combo4": "Spectacular!",
+    "pickColor": "Pick a colour",
+    "pickPiece": "Tap a piece to take it",
+    "noReach": "No colour has reachable blocks",
+    "speedOn": "2x on",
+    "speedOff": "2x paused"
+  },
+  "boosters": {
+    "slot": "+1 Slot",
+    "shuffle": "Shuffle",
+    "tweezers": "Tweezers",
+    "magnet": "Flower Magnet",
+    "slotDesc": "Get a 6th slot until the end of the level.",
+    "shuffleDesc": "Rearranges the pieces in the columns.",
+    "tweezersDesc": "Take any piece to the tray, even one at the back.",
+    "magnetDesc": "The swarm instantly collects every reachable block of one colour.",
+    "newTitle": "New booster!",
+    "gift": "You have {n} free to try.",
+    "buyTitle": "More {name}",
+    "buyCoins": "{price}",
+    "videoLeft": "Watch video ({n} today)",
+    "noVideosLeft": "You have watched today's videos for this booster.",
+    "maxSlots": "You already have the maximum slots",
+    "lockedAt": "Level {n}"
+  },
+  "speed": {
+    "title": "Speed up 2x",
+    "desc": "Bees fly twice as fast for {min} minutes of play.",
+    "short": "Watch {n} short ads",
+    "shortProgress": "{w} of {n} watched",
+    "long": "Watch 1 long ad",
+    "or": "or",
+    "left": "Saved 2x time: {time}",
+    "note": "Time only counts while you play with 2x on. Tap the 2x button to turn it on or pause it.",
+    "limit": "You have used today's maximum. Come back tomorrow!",
+    "full": "You already have the maximum 2x time saved.",
+    "activated": "2x activated!",
+    "oneMore": "1 more short ad to go"
+  },
+  "win": {
+    "title": "Well done!",
+    "double": "x2 coins",
+    "next": "Continue"
+  },
+  "fail": {
+    "title": "Level failed",
+    "lifeLost": "You lost 1 life",
+    "infinite": "You have infinite lives, you lost nothing!"
+  },
+  "nospace": {
+    "title": "Out of space",
+    "text": "The tray is full and no bee can move forward.",
+    "video": "Watch video: +1 slot",
+    "continue": "Continue: +1 slot",
+    "pass": "Revive now with the Pass",
+    "passFree": "Free revive (Pass)",
+    "giveUp": "Give up"
+  },
+  "nolives": {
+    "title": "No lives",
+    "next": "Next life in {time}",
+    "video": "Watch video: +1 life",
+    "text": "The bees are resting. Come back soon!"
+  },
+  "home": {
+    "play": "Play",
+    "levelCube": "LEVEL {n}",
+    "shop": "Shop",
+    "ranking": "Rankings",
+    "home": "Home",
+    "team": "Team",
+    "collection": "Collection",
+    "settings": "Settings"
+  },
+  "events": {
+    "daily": "Daily gift",
+    "pass": "Pass",
+    "treasure": "Treasure",
+    "race": "Race",
+    "sunflower": "Sunflower",
+    "hive": "Hive"
+  },
+  "shop": {
+    "title": "Shop",
+    "coins": "Coins",
+    "noAds": "No ads",
+    "noAdsDesc": "Removes ads between levels and the banner. Reward videos stay available if you want them.",
+    "starter": "Starter pack",
+    "starterDesc": "Only shown once!",
+    "restore": "Restore purchases",
+    "restored": "Purchases restored.",
+    "nothingToRestore": "We found no purchases to restore.",
+    "owned": "Owned",
+    "unavailable": "The shop is not available right now. Check your internet connection.",
+    "thanks": "Thank you for your purchase!",
+    "failed": "The purchase was not completed.",
+    "priceNote": "Prices include VAT. Secure payment through Google Play.",
+    "contains": "Contains:"
+  },
+  "products": {
+    "no_ads": "No ads",
+    "starter_pack": "Starter pack",
+    "coins_s": "Handful of coins",
+    "coins_m": "Bag of coins",
+    "coins_l": "Pot of coins",
+    "coins_xl": "Chest of coins",
+    "pass_season": "Hive Pass Premium",
+    "treasure_1": "Treasure offer",
+    "treasure_2": "Treasure offer",
+    "treasure_3": "Treasure offer"
+  },
+  "reward": {
+    "coins": "{n} coins",
+    "infinite": "{m} min of infinite lives",
+    "speed": "{m} min at 2x",
+    "booster": "{n}x {name}",
+    "lives": "{n} lives",
+    "got": "You got it!"
+  },
+  "settings": {
+    "title": "Settings",
+    "sound": "Sound",
+    "music": "Music",
+    "vibration": "Vibration",
+    "language": "Language",
+    "reducedMotion": "Reduce motion",
+    "privacy": "Privacy and ads",
+    "privacyPolicy": "Privacy policy",
+    "restore": "Restore purchases",
+    "support": "Support",
+    "credits": "Credits and licences",
+    "version": "Version {v}",
+    "langName": "English",
+    "on": "On",
+    "off": "Off"
+  },
+  "credits": {
+    "title": "Credits and licences",
+    "text": "Colmeia Doce - an original game. Art, characters, sounds and music made with code for this game.\n\nFonts: Baloo 2 and Nunito (SIL Open Font License 1.1).\nGame engine: Phaser (MIT licence).\nApp: Capacitor (MIT licence).\nAds: Google Mobile Ads / AdMob (Google terms).\nPurchases: RevenueCat (MIT licence for the SDK).\n\nFull licence texts in licenses/ in the game source."
+  },
+  "daily": {
+    "title": "Daily gift",
+    "day": "Day {n}",
+    "double": "Watch video: x2",
+    "comeBack": "Come back tomorrow for the next gift!",
+    "rules": "You can claim one gift per day. There are 7 days and then the cycle starts again. Watching a video (optional) doubles the day's gift."
+  },
+  "pass": {
+    "title": "Hive Pass",
+    "free": "Free",
+    "premium": "Premium",
+    "buy": "Unlock Premium",
+    "tickets": "{n} tickets",
+    "tier": "{n}",
+    "owned": "Premium active",
+    "rules": "Win levels to collect tickets (Normal 1, Hard 2, Very hard 3). Every 3 tickets you go up a tier and can claim its gift. The Premium track (optional purchase, valid until the end of this 28-day season) has bigger gifts and gives 1 free revive per level when you run out of space."
+  },
+  "treasure": {
+    "title": "Queen's Treasure",
+    "rules": "Claim the gifts in order: each one unlocks the next. There are free steps, video steps (optional) and paid steps (price always shown). The treasure restarts every 2 days.",
+    "done": "You have claimed the whole treasure. Come back when it restarts!",
+    "step": "Step {n}"
+  },
+  "race": {
+    "title": "Flower Race",
+    "start": "Start race",
+    "you": "You",
+    "won": "You won the race!",
+    "lost": "This time another bee got there first.",
+    "expired": "Race time is over.",
+    "open": "Open chest",
+    "close": "New race",
+    "goal": "Win {n} levels in a row on the first try",
+    "rules": "Race against 4 rival bees. The first to win 5 levels in a row on the first try gets the big chest. If you fail a level, you go back to the start. The race lasts 24 hours. The rivals are bees controlled by the game, not real players."
+  },
+  "sunflower": {
+    "title": "Sunflower Climb",
+    "steps": "{n} steps",
+    "rules": "Each level you win is a step up the sunflower. Reach each milestone to get a gift. The climb restarts every week."
+  },
+  "hive": {
+    "title": "Build the Hive",
+    "rules": "Complete tasks to earn materials. When you finish all the tasks in a stage, your hive gets prettier on the home screen.",
+    "complete": "Decorate the hive",
+    "allDone": "Your hive is complete! How lovely!",
+    "stage": "Stage {n} of {m}",
+    "stages": {
+      "base": "Wax base",
+      "porta": "Flowery door",
+      "telhado": "Leaf roof",
+      "jardim": "Flower garden",
+      "bandeira": "Queen's flag"
+    },
+    "tasks": {
+      "win": "Win {n} levels",
+      "winHard": "Win {n} hard levels",
+      "booster": "Use {n} boosters",
+      "daily": "Claim {n} daily gifts",
+      "race": "Win {n} races",
+      "blocks": "Collect {n} blocks",
+      "sunflower": "Claim {n} sunflower gifts"
+    },
+    "materials": {
+      "cera": "Wax",
+      "petala": "Petal",
+      "galho": "Twig",
+      "folha": "Leaf"
+    }
+  },
+  "starter": {
+    "title": "Starter pack",
+    "text": "A sweet boost to get you going. Only shown once!",
+    "later": "Not now"
+  },
+  "tutorial": {
+    "tap": "Tap a piece in the front row",
+    "bees": "The bees collect blocks of that colour, from the outside in",
+    "tray": "Careful: you only have 5 slots. Choose well!",
+    "twins": "Twin pieces",
+    "twinsText": "They are joined by a bar: they go in together and need 2 free slots.",
+    "tubes": "Tube pieces",
+    "tubesText": "When the front piece reaches 0, the piece behind comes up the tube and takes the same slot.",
+    "stones": "Wax stone",
+    "stonesText": "The number goes down by 1 for each block collected. At 0 the stone breaks and frees the block.",
+    "hidden": "Hidden pieces",
+    "hiddenText": "They show \"?\" until they reach the front row.",
+    "flowers": "Closed flowers",
+    "flowersText": "They only open when the shown colour has been fully collected from the board.",
+    "gotIt": "Got it!"
+  },
+  "ads": {
+    "fakeTitle": "Test ad",
+    "fakeShort": "Short ad",
+    "fakeLong": "Long ad",
+    "fakeDone": "Reward earned! You can close.",
+    "rewardIn": "Reward in {s} s",
+    "fakeInterstitial": "Test interstitial",
+    "fakeBanner": "TEST BANNER",
+    "fakeConsentTitle": "Privacy (test)",
+    "fakeConsentText": "In the real app, Google's consent form (UMP) appears here."
+  },
+  "iap": {
+    "fakeTag": "TEST MODE",
+    "fakeTitle": "Test purchase",
+    "fakeNote": "No real payment is made.",
+    "confirm": "Confirm"
+  }
+}
