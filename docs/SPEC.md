@@ -52,6 +52,8 @@ As abelhas desmontam um quadro de pixel art bloco a bloco: escolhes peças de p�
 | 31+ | **Pedra de cera** | bloco escuro no quadro com um número; desce 1 por cada bloco recolhido no nível; a 0 parte-se e liberta os blocos por trás |
 | 41+ | **Peças escondidas** | aparecem com "?" até chegarem à fila da frente |
 | 61+ | **Flores fechadas** | blocos no quadro que só abrem quando a cor vizinha indicada for toda recolhida |
+| 81+ | **Caixas** *(acrescentado a pedido da Jp)* | caixa de madeira por cima de 2x2 a 3x3 blocos, com um número; desce 1 por cada bloco recolhido mesmo ao lado; a 0 parte-se e liberta os blocos |
+| 101+ | **Cores com cadeado** *(acrescentado a pedido da Jp)* | as peças de uma cor têm cadeado e não se podem tocar; recolher N blocos da cor da chave (contador no topo) dá a chave e abre o cadeado |
 
 ### 2.4 Dificuldade
 - Cada nível tem etiqueta **Normal / Difícil / Muito difícil** (aparece no botão Jogar). Padrão de ritmo: mais ou menos 1 difícil a cada 5 níveis e 1 muito difícil a cada 10. Depois de um difícil vem um mais fácil (respiro).

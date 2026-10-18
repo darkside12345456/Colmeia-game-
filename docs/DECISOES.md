@@ -13,6 +13,19 @@ A especificação deixa algumas coisas em aberto. Tomei estas decisões para nã
 | Se viste 1 curto e saíste, o progresso fica guardado até ao fim do dia | Não perder o anúncio já visto | |
 | As recompensas "10 min x2" do Tesouro usam o mesmo tempo 2x | Coerência | |
 
+## Novos desafios: caixas e cores com cadeado (pedido da Jp)
+
+- **Caixas (nível 81+, em mais de metade dos níveis seguintes):** tapam um retângulo de 2x2 a 3x3 blocos. O número desce 1 por
+  cada bloco recolhido **mesmo ao lado** da caixa; a 0 a caixa parte-se. O gerador só põe caixas com blocos suficientes
+  à volta, e a validação recusa caixas impossíveis de partir.
+- **Cores com cadeado (nível 101+, cerca de 3 em cada 10 níveis):** as peças de uma cor têm cadeado. A chave ganha-se
+  a recolher N blocos de outra cor (contador com chave no topo). O N é escolhido a partir da solução do nível, por isso
+  o nível continua sempre resolúvel. As peças com cadeado não são gémeas nem tubos (para não haver bloqueios).
+- O 1.º nível de cada desafio (81 e 101) tem-no sempre, com mini-tutorial.
+- Os níveis 1-80 ficaram exatamente iguais; os 81-300 foram gerados de novo e validados pelo solver.
+- **Abelhas = quadrados:** há um teste automático que joga a solução de cada um dos 300 níveis e confirma que sai
+  exatamente uma abelha por quadrado e que o total de cada cor é igual à soma dos números das peças.
+
 ## Visual moderno (pedido da Jp, substitui parte da secção 7 da especificação)
 
 - A Jp achou o primeiro visual "rústico e demasiado criança". O jogo passou para um estilo **moderno e premium**:
