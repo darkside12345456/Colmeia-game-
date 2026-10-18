@@ -3,7 +3,7 @@
 // Estilo: gemas/vidro com brilho, janelas de vidro fosco, sem contornos pretos grossos.
 import Phaser from 'phaser';
 import { PALETTE } from '../core/palette';
-import { THEME } from '../ui/theme';
+import { RADIUS, THEME } from '../ui/theme';
 import { BEE_COLORS, drawBee, type BeeChar } from './bee';
 import { BEE_CHARS, BEE_EXPRS } from './keys';
 import { ellipse, glossyCircle, glossyTile, rgba, rr, shade, star, strokeFill, type Ctx } from './canvas';
@@ -25,8 +25,8 @@ export function buildTextures(scene: Phaser.Scene): void {
   }
   for (const c of PALETTE) {
     // gemas com um pequeno espaço à volta (os blocos ficam separados, como contas de vidro)
-    ensureTexture(scene, `block_${c.id}`, 64, 64, (ctx) => glossyTile(ctx, 5, 4, 54, 54, 15, c.hex));
-    ensureTexture(scene, `piece_${c.id}`, 128, 128, (ctx) => glossyTile(ctx, 10, 8, 108, 108, 32, c.hex));
+    ensureTexture(scene, `block_${c.id}`, 64, 64, (ctx) => glossyTile(ctx, 5, 4, 54, 54, RADIUS.block, c.hex));
+    ensureTexture(scene, `piece_${c.id}`, 128, 128, (ctx) => glossyTile(ctx, 10, 8, 108, 108, RADIUS.piece, c.hex));
     ensureTexture(scene, `bud_${c.id}`, 64, 64, (ctx) => drawBud(ctx, c.hex));
   }
   ensureTexture(scene, 'ic_speed_badge', 128, 128, (ctx) => {
@@ -37,7 +37,7 @@ export function buildTextures(scene: Phaser.Scene): void {
     ctx.restore();
   });
   ensureTexture(scene, 'stone', 64, 64, drawStone);
-  ensureTexture(scene, 'piece_hidden', 128, 128, (ctx) => glossyTile(ctx, 10, 8, 108, 108, 32, '#6E6894'));
+  ensureTexture(scene, 'piece_hidden', 128, 128, (ctx) => glossyTile(ctx, 10, 8, 108, 108, RADIUS.piece, '#6E6894'));
   ensureTexture(scene, 'slot', 120, 120, drawSlot);
   ensureTexture(scene, 'hive_door', 220, 120, drawHiveDoor);
   ensureTexture(scene, 'cloud', 256, 256, drawBokeh);
@@ -78,7 +78,7 @@ export function buildTextures(scene: Phaser.Scene): void {
 
 function drawBud(ctx: Ctx, hex: string): void {
   // flor fechada: botão com pétalas fechadas da cor do bloco, sobre uma gema verde-escura
-  glossyTile(ctx, 5, 4, 54, 54, 15, '#2F6B4F');
+  glossyTile(ctx, 5, 4, 54, 54, RADIUS.block, '#2F6B4F');
   ctx.save();
   ctx.translate(32, 32);
   for (const [rot, sc] of [
@@ -99,7 +99,7 @@ function drawBud(ctx: Ctx, hex: string): void {
 }
 
 function drawStone(ctx: Ctx): void {
-  glossyTile(ctx, 5, 4, 54, 54, 15, '#4A4560');
+  glossyTile(ctx, 5, 4, 54, 54, RADIUS.block, '#4A4560');
   ctx.strokeStyle = 'rgba(255,255,255,0.22)';
   ctx.lineWidth = 1.6;
   ctx.beginPath();
@@ -115,11 +115,11 @@ function drawStone(ctx: Ctx): void {
 
 function drawSlot(ctx: Ctx): void {
   // poço de vidro escuro com sombra interior
-  rr(ctx, 6, 6, 108, 108, 30);
+  rr(ctx, 6, 6, 108, 108, RADIUS.piece);
   ctx.fillStyle = 'rgba(8,4,24,0.45)';
   ctx.fill();
   ctx.save();
-  rr(ctx, 6, 6, 108, 108, 30);
+  rr(ctx, 6, 6, 108, 108, RADIUS.piece);
   ctx.clip();
   const g = ctx.createLinearGradient(0, 6, 0, 114);
   g.addColorStop(0, 'rgba(0,0,0,0.35)');
@@ -128,7 +128,7 @@ function drawSlot(ctx: Ctx): void {
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, 120, 120);
   ctx.restore();
-  rr(ctx, 6.5, 6.5, 107, 107, 30);
+  rr(ctx, 6.5, 6.5, 107, 107, RADIUS.piece);
   ctx.lineWidth = 2;
   ctx.strokeStyle = 'rgba(255,255,255,0.16)';
   ctx.stroke();
@@ -176,10 +176,10 @@ function drawBokeh(ctx: Ctx): void {
   ctx.fillRect(0, 0, 256, 256);
 }
 
-/** Botão em pílula com gradiente, brilho de vidro e sombra colorida suave. */
+/** Botão de cantos suaves com gradiente, brilho de vidro e sombra colorida suave. */
 export function buttonTexture(scene: Phaser.Scene, w: number, h: number, color: string): string {
   return ensureTexture(scene, `btn_${color}_${w}x${h}`, w, h + 10, (ctx) => {
-    const r = Math.min(h / 2, 34);
+    const r = Math.min(h / 2, RADIUS.button);
     ctx.save();
     ctx.shadowColor = rgba(color, 0.55);
     ctx.shadowBlur = 14;
@@ -214,7 +214,7 @@ export function buttonTexture(scene: Phaser.Scene, w: number, h: number, color: 
 /** Janela de vidro fosco escuro. */
 export function panelTexture(scene: Phaser.Scene, w: number, h: number): string {
   return ensureTexture(scene, `panel_${w}x${h}`, w, h, (ctx) => {
-    const r = 44;
+    const r = RADIUS.panel;
     ctx.save();
     ctx.shadowColor = THEME.shadow;
     ctx.shadowBlur = 30;
@@ -249,13 +249,13 @@ export function panelTexture(scene: Phaser.Scene, w: number, h: number): string 
 export function cardTexture(scene: Phaser.Scene, w: number, h: number, color: string = THEME.card): string {
   return ensureTexture(scene, `card_${color}_${w}x${h}`, w, h, (ctx) => {
     const tint = color !== THEME.card;
-    rr(ctx, 2, 2, w - 4, h - 6, 24);
+    rr(ctx, 2, 2, w - 4, h - 6, RADIUS.card);
     const g = ctx.createLinearGradient(0, 0, 0, h);
     g.addColorStop(0, tint ? rgba(color, 0.32) : THEME.cardHi);
     g.addColorStop(1, tint ? rgba(color, 0.14) : THEME.card);
     ctx.fillStyle = g;
     ctx.fill();
-    rr(ctx, 2.75, 2.75, w - 5.5, h - 7.5, 24);
+    rr(ctx, 2.75, 2.75, w - 5.5, h - 7.5, RADIUS.card);
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = tint ? rgba(color, 0.55) : 'rgba(255,255,255,0.12)';
     ctx.stroke();
@@ -269,11 +269,11 @@ export function frameTexture(scene: Phaser.Scene, w: number, h: number): string 
     ctx.shadowColor = THEME.shadow;
     ctx.shadowBlur = 26;
     ctx.shadowOffsetY = 8;
-    rr(ctx, 10, 6, w - 20, h - 22, 34);
+    rr(ctx, 10, 6, w - 20, h - 22, RADIUS.panel);
     ctx.fillStyle = 'rgba(16,10,40,0.75)';
     ctx.fill();
     ctx.restore();
-    rr(ctx, 10, 6, w - 20, h - 22, 34);
+    rr(ctx, 10, 6, w - 20, h - 22, RADIUS.panel);
     const g = ctx.createLinearGradient(0, 0, 0, h);
     g.addColorStop(0, 'rgba(255,255,255,0.09)');
     g.addColorStop(1, 'rgba(255,255,255,0.03)');
@@ -327,10 +327,9 @@ export function backgroundTexture(scene: Phaser.Scene, w: number, h: number): st
 /** Avatar redondo com a cara da Mel. */
 export function avatarTexture(scene: Phaser.Scene): string {
   return ensureTexture(scene, 'avatar_mel', 128, 128, (ctx) => {
-    glossyCircle(ctx, 64, 64, 56, '#3A2F72');
+    glossyTile(ctx, 8, 8, 112, 112, 112 * RADIUS.iconButton, '#3A2F72');
     ctx.save();
-    ctx.beginPath();
-    ctx.arc(64, 64, 53, 0, Math.PI * 2);
+    rr(ctx, 11, 11, 106, 106, 106 * RADIUS.iconButton);
     ctx.clip();
     drawBee(ctx, 64, 84, 112, 'mel', 'happy');
     ctx.restore();

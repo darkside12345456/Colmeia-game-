@@ -2,7 +2,7 @@
 import Phaser from 'phaser';
 import { app } from '../app';
 import { dur, L } from './core';
-import { FONT } from './theme';
+import { FONT, RADIUS } from './theme';
 
 const CONFETTI_TINTS = [0xff4fa3, 0x4f7bff, 0x22c98a, 0xffb020, 0x8b5cf6, 0x14c8b4, 0xffffff];
 
@@ -120,7 +120,7 @@ export function tutorialHand(scene: Phaser.Scene, x: number, y: number, hole: { 
   dim.fillRect(0, hole.y + hole.h / 2, L.W, L.H - (hole.y + hole.h / 2));
   dim.fillRect(0, hole.y - hole.h / 2, hole.x - hole.w / 2, hole.h);
   dim.fillRect(hole.x + hole.w / 2, hole.y - hole.h / 2, L.W - (hole.x + hole.w / 2), hole.h);
-  dim.lineStyle(6, 0xffffff, 0.9).strokeRoundedRect(hole.x - hole.w / 2, hole.y - hole.h / 2, hole.w, hole.h, 20);
+  dim.lineStyle(6, 0xffffff, 0.9).strokeRoundedRect(hole.x - hole.w / 2, hole.y - hole.h / 2, hole.w, hole.h, RADIUS.card);
   items.push(dim);
   const hand = scene.add.image(x + 40, y + 50, 'ic_hand').setDisplaySize(110, 110).setDepth(2002);
   scene.tweens.add({ targets: hand, x: x + 20, y: y + 30, duration: 520, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });

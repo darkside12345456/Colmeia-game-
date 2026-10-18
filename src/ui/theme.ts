@@ -30,3 +30,16 @@ export const FONT = '"Outfit", system-ui, sans-serif';
 export function hex(c: string): number {
   return parseInt(c.slice(1, 7), 16);
 }
+
+/** Raio dos cantos (unidades do jogo). Valores baixos = visual mais reto e moderno. */
+export const RADIUS = {
+  block: 7,
+  piece: 16,
+  button: 14,
+  iconButton: 0.24,
+  panel: 22,
+  card: 12,
+  tray: 16,
+  bar: 6,
+  chip: 10,
+} as const;

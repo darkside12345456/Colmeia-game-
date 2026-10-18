@@ -1,9 +1,10 @@
-// Botões em pílula com brilho que "afundam" ao tocar (squash & stretch) e respondem logo no toque.
+// Botões de cantos suaves com brilho que "afundam" ao tocar (squash & stretch) e respondem logo no toque.
 import Phaser from 'phaser';
 import { app } from '../app';
-import { glossyCircle } from '../art/canvas';
+import { glossyTile } from '../art/canvas';
 import { buttonTexture, ensureTexture } from '../art/textures';
 import { dur, txt } from './core';
+import { RADIUS } from './theme';
 
 export const COLORS = {
   green: '#22C98A',
@@ -112,10 +113,11 @@ export class Button extends Phaser.GameObjects.Container {
 }
 
 export function roundTexture(scene: Phaser.Scene, d: number, color: string): string {
-  return ensureTexture(scene, `round_${color}_${d}`, d + 8, d + 12, (ctx) => glossyCircle(ctx, (d + 8) / 2, (d + 8) / 2, d / 2, color));
+  // quadrado de cantos suaves (menos "redondinho")
+  return ensureTexture(scene, `round_${color}_${d}`, d + 8, d + 12, (ctx) => glossyTile(ctx, 4, 4, d, d, d * RADIUS.iconButton, color));
 }
 
-/** Botão redondo pequeno com ícone (pausa, definições, fechar, info). */
+/** Botão quadrado pequeno com ícone (pausa, definições, fechar, info). */
 export function iconButton(scene: Phaser.Scene, x: number, y: number, icon: string, color: string, onClick: () => void, d = 84): Button {
   return new Button(scene, x, y, { round: true, w: d, color, icon, iconSize: d * 0.58, onClick });
 }

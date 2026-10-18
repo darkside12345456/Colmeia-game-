@@ -6,12 +6,13 @@ import { type BoosterId } from '../meta/config';
 import { livesInfo, type Reward } from '../meta/economy';
 import { Button, COLORS } from './Button';
 import { dur, INK, L, txt } from './core';
+import { RADIUS } from './theme';
 
 function pill(scene: Phaser.Scene, w: number, h: number): Phaser.GameObjects.Graphics {
   const g = scene.add.graphics();
-  // pílula de vidro escuro
-  g.fillStyle(0x07041a, 0.55).fillRoundedRect(-w / 2, -h / 2, w, h, h / 2);
-  g.lineStyle(2, 0xffffff, 0.14).strokeRoundedRect(-w / 2, -h / 2, w, h, h / 2);
+  // caixa de vidro escuro
+  g.fillStyle(0x07041a, 0.55).fillRoundedRect(-w / 2, -h / 2, w, h, RADIUS.chip);
+  g.lineStyle(2, 0xffffff, 0.14).strokeRoundedRect(-w / 2, -h / 2, w, h, RADIUS.chip);
   return g;
 }
 
@@ -113,8 +114,8 @@ export function toast(scene: Phaser.Scene, msg: string, y = L.H * 0.42): void {
   const w = Math.min(660, label.width + 60);
   const h = label.height + 30;
   const g = scene.add.graphics();
-  g.fillStyle(0x1d1740, 0.94).fillRoundedRect(-w / 2, -h / 2, w, h, 24);
-  g.lineStyle(2, 0xffffff, 0.16).strokeRoundedRect(-w / 2, -h / 2, w, h, 24);
+  g.fillStyle(0x1d1740, 0.94).fillRoundedRect(-w / 2, -h / 2, w, h, RADIUS.card);
+  g.lineStyle(2, 0xffffff, 0.16).strokeRoundedRect(-w / 2, -h / 2, w, h, RADIUS.card);
   c.add([g, label]);
   c.setScale(0.6).setAlpha(0);
   scene.tweens.add({ targets: c, scale: 1, alpha: 1, duration: dur(180), ease: 'Back.easeOut' });
@@ -134,8 +135,8 @@ export class ProgressBar extends Phaser.GameObjects.Container {
   ) {
     super(scene, x, y);
     const g = scene.add.graphics();
-    g.fillStyle(0x07041a, 0.6).fillRoundedRect(-bw / 2, -bh / 2, bw, bh, bh / 2);
-    g.lineStyle(2, 0xffffff, 0.12).strokeRoundedRect(-bw / 2, -bh / 2, bw, bh, bh / 2);
+    g.fillStyle(0x07041a, 0.6).fillRoundedRect(-bw / 2, -bh / 2, bw, bh, Math.min(bh / 2, RADIUS.bar));
+    g.lineStyle(2, 0xffffff, 0.12).strokeRoundedRect(-bw / 2, -bh / 2, bw, bh, Math.min(bh / 2, RADIUS.bar));
     this.fill = scene.add.graphics();
     this.add([g, this.fill]);
     scene.add.existing(this);
@@ -145,8 +146,8 @@ export class ProgressBar extends Phaser.GameObjects.Container {
     const w = Math.max(this.bh, this.bw * this.value);
     this.fill.clear();
     if (this.value <= 0) return this;
-    this.fill.fillStyle(this.color, 1).fillRoundedRect(-this.bw / 2, -this.bh / 2, w, this.bh, this.bh / 2);
-    this.fill.fillStyle(0xffffff, 0.35).fillRoundedRect(-this.bw / 2 + 4, -this.bh / 2 + 3, w - 8, this.bh * 0.35, this.bh * 0.17);
+    this.fill.fillStyle(this.color, 1).fillRoundedRect(-this.bw / 2, -this.bh / 2, w, this.bh, Math.min(this.bh / 2, RADIUS.bar));
+    this.fill.fillStyle(0xffffff, 0.35).fillRoundedRect(-this.bw / 2 + 4, -this.bh / 2 + 3, w - 8, this.bh * 0.35, Math.min(this.bh * 0.17, RADIUS.bar / 2));
     return this;
   }
 }

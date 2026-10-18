@@ -25,7 +25,9 @@ A especificação deixa algumas coisas em aberto. Tomei estas decisões para nã
   foram atualizados.
 - As abelhas mantêm a personalidade, mas com traço fino e asas de vidro.
 - Ícone, splash e imagens da loja foram gerados de novo no mesmo estilo.
-- Cores e letra ficam num só sítio (`src/ui/theme.ts`), por isso mudar o visual outra vez é fácil.
+- Depois, a pedido da Jp, as formas ficaram **menos arredondadas**: cantos mais retos em blocos, peças, botões,
+  janelas e cartões; os botões redondos passaram a quadrados de cantos suaves.
+- Cores, letra e raios dos cantos ficam num só sítio (`src/ui/theme.ts`, `RADIUS`), por isso mudar o visual outra vez é fácil.
 - A lógica do jogo e os níveis não mudaram.
 
 ## Economia e preços (inventados por mim - confirma)

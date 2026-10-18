@@ -40,7 +40,7 @@ import {
 } from '../meta/events';
 import { Button, COLORS, iconButton } from '../ui/Button';
 import { INK, L, txt } from '../ui/core';
-import { hex, THEME } from '../ui/theme';
+import { hex, RADIUS, THEME } from '../ui/theme';
 import { hiveView } from '../ui/hive';
 import { Modal } from '../ui/Modal';
 import { ProgressBar, rewardRow, ScrollArea, toast } from '../ui/widgets';
@@ -313,8 +313,8 @@ export function raceModal(scene: Phaser.Scene, onChange?: () => void): void {
   lanes.forEach((ln, i) => {
     const y = -300 + i * 120;
     const g = scene.add.graphics();
-    g.fillStyle(i === 0 ? hex(THEME.accent) : 0xffffff, i === 0 ? 0.16 : 0.06).fillRoundedRect(-300, y - 50, 600, 100, 24);
-    g.lineStyle(2, i === 0 ? hex(THEME.accent) : 0xffffff, i === 0 ? 0.6 : 0.14).strokeRoundedRect(-300, y - 50, 600, 100, 24);
+    g.fillStyle(i === 0 ? hex(THEME.accent) : 0xffffff, i === 0 ? 0.16 : 0.06).fillRoundedRect(-300, y - 50, 600, 100, RADIUS.card);
+    g.lineStyle(2, i === 0 ? hex(THEME.accent) : 0xffffff, i === 0 ? 0.6 : 0.14).strokeRoundedRect(-300, y - 50, 600, 100, RADIUS.card);
     m.addContent(g);
     m.addContent(scene.add.image(-250, y, ln.tex).setDisplaySize(80, 80));
     m.addContent(txt(scene, -200, y - 26, ln.name, 22, { origin: [0, 0.5], color: INK, stroke: false }));

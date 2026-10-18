@@ -18,7 +18,7 @@ import { Button, COLORS, iconButton } from '../ui/Button';
 import { BaseScene, dur, INK, L, txt } from '../ui/core';
 import { burst, confetti, flash, tutorialHand } from '../ui/fx';
 import { closeTopModal, modalOpen } from '../ui/Modal';
-import { hex, THEME } from '../ui/theme';
+import { hex, RADIUS, THEME } from '../ui/theme';
 import { badge, toast } from '../ui/widgets';
 import {
   boosterBuyModal,
@@ -291,9 +291,9 @@ export class GameScene extends BaseScene {
   private buildTray(): void {
     const g = this.add.graphics().setDepth(20);
     // bandeja de vidro escuro
-    g.fillStyle(0x07041a, 0.3).fillRoundedRect(10, this.trayY - 64, L.W - 20, 140, 36);
-    g.fillStyle(0x07041a, 0.5).fillRoundedRect(10, this.trayY - 70, L.W - 20, 136, 36);
-    g.lineStyle(2, 0xffffff, 0.14).strokeRoundedRect(10, this.trayY - 70, L.W - 20, 136, 36);
+    g.fillStyle(0x07041a, 0.3).fillRoundedRect(10, this.trayY - 64, L.W - 20, 140, RADIUS.tray);
+    g.fillStyle(0x07041a, 0.5).fillRoundedRect(10, this.trayY - 70, L.W - 20, 136, RADIUS.tray);
+    g.lineStyle(2, 0xffffff, 0.14).strokeRoundedRect(10, this.trayY - 70, L.W - 20, 136, RADIUS.tray);
     this.layoutSlots(false);
   }
 
@@ -878,8 +878,8 @@ export class GameScene extends BaseScene {
     const c = this.add.container(L.W / 2, this.boostersY - 110).setDepth(300);
     const w = Math.min(690, colors.length * 86 + 40);
     const g = this.add.graphics();
-    g.fillStyle(hex(THEME.panelBottom), 0.96).fillRoundedRect(-w / 2, -70, w, 140, 30);
-    g.lineStyle(2, 0xffffff, 0.16).strokeRoundedRect(-w / 2, -70, w, 140, 30);
+    g.fillStyle(hex(THEME.panelBottom), 0.96).fillRoundedRect(-w / 2, -70, w, 140, RADIUS.panel);
+    g.lineStyle(2, 0xffffff, 0.16).strokeRoundedRect(-w / 2, -70, w, 140, RADIUS.panel);
     c.add(g);
     c.add(txt(this, 0, -48, t('game.pickColor'), 26));
     colors.forEach((col, i) => {

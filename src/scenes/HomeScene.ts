@@ -24,7 +24,7 @@ import { levelDifficulty, loadLevel } from '../levels';
 import { Button, COLORS, iconButton } from '../ui/Button';
 import { BaseScene, dur, L, txt } from '../ui/core';
 import { pollen } from '../ui/fx';
-import { hex, THEME } from '../ui/theme';
+import { hex, RADIUS, THEME } from '../ui/theme';
 import { hiveView } from '../ui/hive';
 import { closeTopModal, modalOpen } from '../ui/Modal';
 import { badge, CoinCounter, LivesCounter } from '../ui/widgets';
@@ -218,9 +218,9 @@ export class HomeScene extends BaseScene {
     const y = L.H - 92;
     const g = this.add.graphics();
     // barra de vidro escuro
-    g.fillStyle(0x07041a, 0.35).fillRoundedRect(8, y - 72, L.W - 16, 156, 40);
-    g.fillStyle(hex(THEME.panelBottom), 0.92).fillRoundedRect(8, y - 78, L.W - 16, 156, 40);
-    g.lineStyle(2, 0xffffff, 0.14).strokeRoundedRect(8, y - 78, L.W - 16, 156, 40);
+    g.fillStyle(0x07041a, 0.35).fillRoundedRect(8, y - 72, L.W - 16, 156, RADIUS.panel);
+    g.fillStyle(hex(THEME.panelBottom), 0.92).fillRoundedRect(8, y - 78, L.W - 16, 156, RADIUS.panel);
+    g.lineStyle(2, 0xffffff, 0.14).strokeRoundedRect(8, y - 78, L.W - 16, 156, RADIUS.panel);
     const items: [string, string, () => void][] = [
       ['ic_shop', t('home.shop'), () => shopModal(this)],
       ['ic_ranking', t('home.ranking'), () => comingSoonModal(this, t('home.ranking'), 'ic_ranking')],
@@ -233,8 +233,8 @@ export class HomeScene extends BaseScene {
       const home = i === 2;
       if (home) {
         const hl = this.add.graphics();
-        hl.fillStyle(hex(THEME.accent), 0.2).fillRoundedRect(x - 64, y - 68, 128, 136, 30);
-        hl.lineStyle(2, hex(THEME.accent), 0.7).strokeRoundedRect(x - 64, y - 68, 128, 136, 30);
+        hl.fillStyle(hex(THEME.accent), 0.2).fillRoundedRect(x - 64, y - 68, 128, 136, RADIUS.card);
+        hl.lineStyle(2, hex(THEME.accent), 0.7).strokeRoundedRect(x - 64, y - 68, 128, 136, RADIUS.card);
       }
       const ic = this.add.image(x, y - 14 - (home ? 8 : 0), icon).setDisplaySize(home ? 92 : 76, home ? 92 : 76);
       ic.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
