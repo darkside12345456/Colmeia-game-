@@ -3,17 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-    <meta name="theme-color" content="#F2AB27" />
+    <meta name="theme-color" content="#120D2E" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' data: blob:; connect-src 'self' https:; frame-src https:;" />
     <title>Colmeia Doce</title>
     <link rel="icon" href="./icon.svg" />
     <style>
-      html, body { margin: 0; padding: 0; height: 100%; background: #FBF6EA; overflow: hidden; overscroll-behavior: none;
+      html, body { margin: 0; padding: 0; height: 100%; background: linear-gradient(#120D2E, #26154A 55%, #43205A); overflow: hidden; overscroll-behavior: none;
         -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; touch-action: none; }
       #game { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
       #loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column;
-        font: 800 22px 'Nunito', sans-serif; color: #2E2412; }
-      #loading .dot { width: 64px; height: 64px; border-radius: 50%; background: #F7B92E; border: 5px solid #2E2412;
+        font: 600 22px system-ui, sans-serif; color: #F5F2FF; }
+      #loading .dot { width: 64px; height: 64px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FFE29A, #FFC23D 55%, #E8961E); box-shadow: 0 0 40px rgba(255,182,39,.55);
         animation: b 0.9s ease-in-out infinite alternate; }
       @keyframes b { from { transform: translateY(0) } to { transform: translateY(-18px) } }
     </style>

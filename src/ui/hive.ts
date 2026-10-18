@@ -1,6 +1,6 @@
 // A colmeia do jogador (Construir a Colmeia): cada etapa completa acrescenta uma decoração.
 import Phaser from 'phaser';
-import { ellipse, INK, rr, shade, strokeFill, type Ctx } from '../art/canvas';
+import { ellipse, LINE, rr, shade, strokeFill, type Ctx } from '../art/canvas';
 import { ensureTexture } from '../art/textures';
 
 function flower(ctx: Ctx, x: number, y: number, r: number, petal: string): void {
@@ -45,7 +45,7 @@ function textures(scene: Phaser.Scene): void {
     }
   });
   ensureTexture(scene, 'hive_doorflowers', 200, 80, (ctx) => {
-    flower(ctx, 30, 50, 22, '#F2059F');
+    flower(ctx, 30, 50, 22, '#FF4FA3');
     flower(ctx, 170, 50, 22, '#F7A8CF');
     flower(ctx, 100, 22, 16, '#FFFFFF');
   });
@@ -61,18 +61,18 @@ function textures(scene: Phaser.Scene): void {
       ctx.translate(x, y);
       ctx.rotate(rot);
       ellipse(ctx, 0, 0, 22, 44);
-      strokeFill(ctx, '#54C143', 4);
+      strokeFill(ctx, '#22C98A', 4);
       ctx.beginPath();
       ctx.moveTo(0, -38);
       ctx.lineTo(0, 38);
       ctx.lineWidth = 2.5;
-      ctx.strokeStyle = INK;
+      ctx.strokeStyle = LINE;
       ctx.stroke();
       ctx.restore();
     }
   });
   ensureTexture(scene, 'hive_garden', 520, 140, (ctx) => {
-    const cols = ['#F2059F', '#0293F2', '#8302D2', '#F7A8CF', '#FFFFFF', '#F2AB27'];
+    const cols = ['#FF4FA3', '#4F7BFF', '#8B5CF6', '#F7A8CF', '#FFFFFF', '#FFB020'];
     for (let i = 0; i < 9; i++) {
       const x = 30 + i * 58 + (i > 3 ? 70 : 0) - (i > 3 ? 70 : 0);
       if (i === 4) continue;
@@ -93,7 +93,7 @@ function textures(scene: Phaser.Scene): void {
     ctx.lineTo(112, 34);
     ctx.lineTo(30, 62);
     ctx.closePath();
-    strokeFill(ctx, '#F2059F', 4);
+    strokeFill(ctx, '#FF4FA3', 4);
     ctx.beginPath();
     ctx.moveTo(48, 30);
     ctx.lineTo(56, 22);

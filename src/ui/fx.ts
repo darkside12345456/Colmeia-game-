@@ -2,8 +2,9 @@
 import Phaser from 'phaser';
 import { app } from '../app';
 import { dur, L } from './core';
+import { FONT } from './theme';
 
-const CONFETTI_TINTS = [0xf2059f, 0x0293f2, 0x54c143, 0xf2ab27, 0x8302d2, 0x0fbf9f, 0xffffff];
+const CONFETTI_TINTS = [0xff4fa3, 0x4f7bff, 0x22c98a, 0xffb020, 0x8b5cf6, 0x14c8b4, 0xffffff];
 
 export function confetti(scene: Phaser.Scene, x: number, y: number, count = 60, depth = 3000): void {
   const n = app.reducedMotion() ? Math.round(count / 3) : count;
@@ -113,7 +114,7 @@ export function flash(scene: Phaser.Scene, x: number, y: number, w: number, h: n
 export function tutorialHand(scene: Phaser.Scene, x: number, y: number, hole: { x: number; y: number; w: number; h: number }, text?: string, textY?: number): () => void {
   const items: Phaser.GameObjects.GameObject[] = [];
   const dim = scene.add.graphics().setDepth(2000);
-  dim.fillStyle(0x1a1206, 0.55);
+  dim.fillStyle(0x07041a, 0.62);
   // escurece tudo menos o "buraco"
   dim.fillRect(0, 0, L.W, hole.y - hole.h / 2);
   dim.fillRect(0, hole.y + hole.h / 2, L.W, L.H - (hole.y + hole.h / 2));
@@ -128,12 +129,11 @@ export function tutorialHand(scene: Phaser.Scene, x: number, y: number, hole: { 
     const ty = textY ?? hole.y - hole.h / 2 - 80;
     const label = scene.add
       .text(L.W / 2, ty, text, {
-        fontFamily: '"Baloo 2", sans-serif',
+        fontFamily: FONT,
         fontSize: '36px',
-        fontStyle: '800',
+        fontStyle: '700',
         color: '#FFFFFF',
-        stroke: '#2E2412',
-        strokeThickness: 7,
+        shadow: { offsetX: 0, offsetY: 2, color: 'rgba(8,4,24,0.8)', blur: 8, fill: true },
         align: 'center',
         wordWrap: { width: 620, useAdvancedWrap: true },
       })

@@ -8,6 +8,7 @@ import { productReward, STARTER_PACK } from '../meta/products';
 import { env } from '../services/platform';
 import { Button, COLORS } from '../ui/Button';
 import { INK, L, txt } from '../ui/core';
+import { THEME } from '../ui/theme';
 import { Modal } from '../ui/Modal';
 import { rewardRow, ScrollArea, toast, toggleRow } from '../ui/widgets';
 import { rewardModal } from './modals';
@@ -47,7 +48,7 @@ export function shopModal(scene: Phaser.Scene): void {
   m.addContent(area);
   const c = area.content;
   let y = 10;
-  const card = (hh: number, color = '#FFFFFF') => {
+  const card = (hh: number, color: string = THEME.card) => {
     const img = scene.add.image(0, y + hh / 2, cardTexture(scene, 600, hh, color));
     c.add(img);
     const top = y;
@@ -75,12 +76,12 @@ export function shopModal(scene: Phaser.Scene): void {
   };
 
   {
-    const top = card(270, '#D7F0FF');
+    const top = card(270, '#4F7BFF');
     c.add(scene.add.image(-220, top + 70, 'ic_video').setDisplaySize(100, 100));
     c.add(scene.add.image(-220, top + 70, 'ic_close').setDisplaySize(70, 70).setAlpha(0.9));
     c.add(txt(scene, 50, top + 44, t('shop.noAds'), 38));
     c.add(txt(scene, 50, top + 120, t('shop.noAdsDesc'), 21, { body: true, wrap: 420 }));
-    if (app.noAds()) c.add(txt(scene, 0, top + 215, t('shop.owned'), 30, { color: '#54C143' }));
+    if (app.noAds()) c.add(txt(scene, 0, top + 215, t('shop.owned'), 30, { color: '#22C98A' }));
     else buyBtn(0, top + 212, 'no_ads', 240);
   }
   const packs = Object.entries(config().coinPacks);
@@ -107,7 +108,7 @@ export function shopModal(scene: Phaser.Scene): void {
     }),
   );
   m.addContent(txt(scene, 0, h / 2 - 72, t('shop.priceNote'), 20, { body: true, wrap: 560 }));
-  if (!app.iap.available()) m.addContent(txt(scene, 0, -h / 2 + 64, t('shop.unavailable'), 20, { body: true, color: '#E8384F', wrap: 560 }));
+  if (!app.iap.available()) m.addContent(txt(scene, 0, -h / 2 + 64, t('shop.unavailable'), 20, { body: true, color: '#FF4D6D', wrap: 560 }));
 }
 
 async function restorePurchases(scene: Phaser.Scene): Promise<void> {

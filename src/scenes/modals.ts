@@ -330,7 +330,7 @@ export function speedModal(scene: Phaser.Scene, onChange?: () => void): void {
   m.addContent(icon);
   scene.tweens.add({ targets: icon, scale: icon.scale * 1.08, duration: 500, yoyo: true, repeat: -1 });
   m.addContent(bodyText(scene, -160, t('speed.desc', { min: config().speedBoost.minutes }), 30));
-  const saved = txt(scene, 0, -80, '', 30, { color: '#0293F2', stroke: false });
+  const saved = txt(scene, 0, -80, '', 30, { color: '#8EB0FF', stroke: false });
   m.addContent(saved);
   const needed = config().speedBoost.shortAdsNeeded;
   const status = bodyText(scene, 310, '', 24);
@@ -457,14 +457,14 @@ export function obstacleModal(scene: Phaser.Scene, key: string): Promise<void> {
     const g = scene.add.graphics();
     ill.add(g);
     if (key === 'twins') {
-      g.lineStyle(22, 0x2e2412).lineBetween(-80, 0, 80, 0);
-      g.lineStyle(14, 0xf2ab27).lineBetween(-80, 0, 80, 0);
+      g.lineStyle(22, 0x07041a, 0.45).lineBetween(-80, 0, 80, 0);
+      g.lineStyle(14, 0xffb020).lineBetween(-80, 0, 80, 0);
       ill.add(scene.add.image(-80, 0, 'piece_rosa').setDisplaySize(110, 110));
       ill.add(scene.add.image(80, 0, 'piece_azul').setDisplaySize(110, 110));
       ill.add(txt(scene, -80, -4, '12', 44));
       ill.add(txt(scene, 80, -4, '9', 44));
     } else if (key === 'tubes') {
-      g.lineStyle(32, 0x2e2412).lineBetween(0, -60, 0, 60);
+      g.lineStyle(32, 0x07041a, 0.45).lineBetween(0, -60, 0, 60);
       g.lineStyle(22, 0x8fd3ff).lineBetween(0, -60, 0, 60);
       ill.add(scene.add.image(0, -60, 'piece_verde').setDisplaySize(100, 100));
       ill.add(scene.add.image(0, 70, 'piece_violeta').setDisplaySize(90, 90).setAlpha(0.7));
@@ -478,7 +478,7 @@ export function obstacleModal(scene: Phaser.Scene, key: string): Promise<void> {
       ill.add(txt(scene, 0, -4, '?', 64));
     } else {
       ill.add(scene.add.image(0, 0, 'bud_rosa').setDisplaySize(140, 140));
-      ill.add(scene.add.image(48, -48, 'px_dot').setDisplaySize(70, 70).setTint(0x0293f2));
+      ill.add(scene.add.image(48, -48, 'px_dot').setDisplaySize(70, 70).setTint(0x4f7bff));
     }
     m.addContent(bodyText(scene, 60, t(`tutorial.${key}Text`), 30));
     m.addContent(new Button(scene, 0, 240, { w: 360, h: 100, color: COLORS.green, label: t('tutorial.gotIt'), onClick: () => m.close() }));

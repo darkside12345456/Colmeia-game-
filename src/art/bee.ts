@@ -6,11 +6,11 @@ export type BeeChar = 'mel' | 'lila' | 'azu' | 'menta' | 'rainha';
 export type BeeExpr = 'happy' | 'celebrate' | 'sad' | 'focused' | 'blink';
 
 export const BEE_COLORS: Record<BeeChar, { body: string; stripe: string; cheek: string }> = {
-  mel: { body: '#F7B92E', stripe: '#3A2A12', cheek: '#F7A8CF' },
-  lila: { body: '#F7A8CF', stripe: '#B0187A', cheek: '#F2059F' },
-  azu: { body: '#8FD3FF', stripe: '#0262A8', cheek: '#F7A8CF' },
-  menta: { body: '#ABF9A4', stripe: '#2F8A27', cheek: '#F7A8CF' },
-  rainha: { body: '#F2AB27', stripe: '#5A2E0E', cheek: '#F7A8CF' },
+  mel: { body: '#FFC23D', stripe: '#2A1C3D', cheek: '#FF8FB8' },
+  lila: { body: '#FF9CCB', stripe: '#7A1F5C', cheek: '#FF5FA2' },
+  azu: { body: '#8EC5FF', stripe: '#24357A', cheek: '#FF9CCB' },
+  menta: { body: '#8FF0C4', stripe: '#1E5B4A', cheek: '#FF9CCB' },
+  rainha: { body: '#FFB627', stripe: '#3B1F52', cheek: '#FF8FB8' },
 };
 
 /**
@@ -19,7 +19,8 @@ export const BEE_COLORS: Record<BeeChar, { body: string; stripe: string; cheek: 
  */
 export function drawBee(ctx: Ctx, cx: number, cy: number, s: number, char: BeeChar, expr: BeeExpr, wing = 0.5, side = false): void {
   const c = BEE_COLORS[char];
-  const lw = Math.max(1.5, s * 0.045);
+  const lw = Math.max(1.2, s * 0.024);
+  const rim = shade(c.body, -0.45);
   ctx.save();
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
@@ -31,10 +32,14 @@ export function drawBee(ctx: Ctx, cx: number, cy: number, s: number, char: BeeCh
     ctx.translate(cx + dir * s * 0.18, cy - s * 0.28);
     ctx.rotate(dir * (0.55 + wingLift));
     ellipse(ctx, dir * s * 0.12, -s * 0.18, s * 0.17, s * 0.27);
-    ctx.fillStyle = 'rgba(225,245,255,0.85)';
+    const wg = ctx.createLinearGradient(0, -s * 0.45, 0, s * 0.05);
+    wg.addColorStop(0, 'rgba(255,255,255,0.92)');
+    wg.addColorStop(0.6, 'rgba(200,225,255,0.72)');
+    wg.addColorStop(1, 'rgba(230,200,255,0.6)');
+    ctx.fillStyle = wg;
     ctx.fill();
     ctx.lineWidth = lw;
-    ctx.strokeStyle = INK;
+    ctx.strokeStyle = 'rgba(120,110,190,0.55)';
     ctx.stroke();
     ctx.fillStyle = 'rgba(255,255,255,0.8)';
     ellipse(ctx, dir * s * 0.08, -s * 0.26, s * 0.05, s * 0.09);
@@ -53,7 +58,7 @@ export function drawBee(ctx: Ctx, cx: number, cy: number, s: number, char: BeeCh
     ctx.lineTo(cx, cy + s * 0.52);
     ctx.lineTo(cx + s * 0.06, cy + s * 0.4);
   }
-  ctx.fillStyle = INK;
+  ctx.fillStyle = c.stripe;
   ctx.fill();
 
   // antenas
@@ -61,14 +66,12 @@ export function drawBee(ctx: Ctx, cx: number, cy: number, s: number, char: BeeCh
     ctx.beginPath();
     ctx.moveTo(cx + dir * s * 0.12, cy - s * 0.36);
     ctx.quadraticCurveTo(cx + dir * s * 0.16, cy - s * 0.58, cx + dir * s * 0.28, cy - s * 0.62);
-    ctx.lineWidth = lw * 1.1;
-    ctx.strokeStyle = INK;
+    ctx.lineWidth = lw * 1.3;
+    ctx.strokeStyle = c.stripe;
     ctx.stroke();
-    ellipse(ctx, cx + dir * s * 0.29, cy - s * 0.63, s * 0.055, s * 0.055);
+    ellipse(ctx, cx + dir * s * 0.29, cy - s * 0.63, s * 0.06, s * 0.06);
     ctx.fillStyle = c.stripe;
     ctx.fill();
-    ctx.lineWidth = lw * 0.8;
-    ctx.stroke();
   }
 
   // corpo
@@ -105,8 +108,8 @@ export function drawBee(ctx: Ctx, cx: number, cy: number, s: number, char: BeeCh
   ctx.fill();
   ctx.restore();
   ellipse(ctx, cx, cy, rx, ry);
-  ctx.lineWidth = lw * 1.4;
-  ctx.strokeStyle = INK;
+  ctx.lineWidth = lw * 1.2;
+  ctx.strokeStyle = rim;
   ctx.stroke();
 
   // cara
@@ -137,7 +140,7 @@ function drawFace(ctx: Ctx, fx: number, fy: number, s: number, ex: number, expr:
       ctx.beginPath();
       if (expr === 'celebrate') ctx.arc(x, fy + eyeR * 0.3, eyeR * 0.75, Math.PI * 1.1, Math.PI * 1.9);
       else ctx.arc(x, fy - eyeR * 0.2, eyeR * 0.75, Math.PI * 0.15, Math.PI * 0.85);
-      ctx.lineWidth = lw * 1.3;
+      ctx.lineWidth = lw * 2.4;
       ctx.strokeStyle = INK;
       ctx.stroke();
       continue;
@@ -156,7 +159,7 @@ function drawFace(ctx: Ctx, fx: number, fy: number, s: number, ex: number, expr:
       const up = expr === 'sad' ? 1 : -1;
       ctx.moveTo(x - dir * eyeR * 0.9, fy - eyeR * 1.45 + up * eyeR * 0.35 * -1);
       ctx.lineTo(x + dir * eyeR * 0.7, fy - eyeR * 1.45 - up * eyeR * 0.35 * -1);
-      ctx.lineWidth = lw * 1.1;
+      ctx.lineWidth = lw * 2;
       ctx.strokeStyle = INK;
       ctx.stroke();
     }
@@ -165,7 +168,7 @@ function drawFace(ctx: Ctx, fx: number, fy: number, s: number, ex: number, expr:
   // boca
   ctx.beginPath();
   const my = fy + s * 0.13;
-  ctx.lineWidth = lw * 1.1;
+  ctx.lineWidth = lw * 2;
   ctx.strokeStyle = INK;
   if (expr === 'celebrate') {
     ctx.moveTo(fx - s * 0.08, my - s * 0.01);
@@ -206,9 +209,9 @@ function drawCrown(ctx: Ctx, cx: number, cy: number, w: number, lw: number): voi
   ctx.fillStyle = g;
   ctx.fill();
   ctx.lineWidth = lw;
-  ctx.strokeStyle = INK;
+  ctx.strokeStyle = 'rgba(150,90,10,0.6)';
   ctx.stroke();
-  ctx.fillStyle = '#F2059F';
+  ctx.fillStyle = '#FF5FA2';
   ellipse(ctx, cx, cy - w * 0.18, w * 0.07, w * 0.07);
   ctx.fill();
 }

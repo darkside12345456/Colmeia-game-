@@ -1,4 +1,4 @@
-// Botões com relevo que "afundam" ao tocar (squash & stretch) e respondem logo no toque.
+// Botões em pílula com brilho que "afundam" ao tocar (squash & stretch) e respondem logo no toque.
 import Phaser from 'phaser';
 import { app } from '../app';
 import { glossyCircle } from '../art/canvas';
@@ -6,15 +6,17 @@ import { buttonTexture, ensureTexture } from '../art/textures';
 import { dur, txt } from './core';
 
 export const COLORS = {
-  green: '#54C143',
-  blue: '#0293F2',
-  red: '#E8384F',
-  honey: '#F2AB27',
-  pink: '#F2059F',
-  purple: '#8302D2',
-  grey: '#9AA3AD',
-  white: '#FFFFFF',
-  teal: '#0FBF9F',
+  green: '#22C98A',
+  blue: '#4F7BFF',
+  red: '#FF4D6D',
+  honey: '#FFB020',
+  pink: '#FF4FA3',
+  purple: '#8B5CF6',
+  grey: '#5A5480',
+  white: '#EDE9FF',
+  teal: '#14C8B4',
+  /** vidro (botões secundários sobre o fundo escuro) */
+  glass: '#463C82',
 };
 
 export interface ButtonOpts {

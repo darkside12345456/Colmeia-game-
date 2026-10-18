@@ -1,8 +1,8 @@
-// Ecrã inicial (secção 6.1): jardim animado, a Mel a segurar o cubo do nível, eventos,
+// Ecrã inicial (secção 6.1): fundo noturno com luzes, a Mel a segurar o cubo do nível, eventos,
 // contadores, botão Jogar com a dificuldade e barra de baixo.
 import Phaser from 'phaser';
 import { app } from '../app';
-import { avatarTexture, gardenTexture } from '../art/textures';
+import { avatarTexture, backgroundTexture } from '../art/textures';
 import { formatDuration, t } from '../i18n';
 import { config } from '../meta/config';
 import { canPlay } from '../meta/economy';
@@ -24,6 +24,7 @@ import { levelDifficulty, loadLevel } from '../levels';
 import { Button, COLORS, iconButton } from '../ui/Button';
 import { BaseScene, dur, L, txt } from '../ui/core';
 import { pollen } from '../ui/fx';
+import { hex, THEME } from '../ui/theme';
 import { hiveView } from '../ui/hive';
 import { closeTopModal, modalOpen } from '../ui/Modal';
 import { badge, CoinCounter, LivesCounter } from '../ui/widgets';
@@ -55,8 +56,8 @@ export class HomeScene extends BaseScene {
     super.create();
     this.starting = false;
     this.eventObjs = [];
-    this.add.image(0, 0, gardenTexture(this, L.W, L.H)).setOrigin(0, 0);
-    this.clouds();
+    this.add.image(0, 0, backgroundTexture(this, L.W, L.H)).setOrigin(0, 0);
+    this.ambientLights();
     pollen(this, 4);
     // a colmeia do jogador fica entre a Mel e o botão Jogar (mais pequena em ecrãs baixos)
     const small = L.H < 1400;
@@ -78,24 +79,31 @@ export class HomeScene extends BaseScene {
     this.time.delayedCall(dur(450), () => this.autoPopups());
   }
 
-  private clouds(): void {
-    for (let i = 0; i < 4; i++) {
-      const y = 140 + i * 110 + Math.random() * 40;
-      const c = this.add.image(Math.random() * L.W, y, 'cloud').setAlpha(0.85).setScale(0.6 + Math.random() * 0.6);
-      const speed = 40000 + Math.random() * 40000;
+  /** Luzes desfocadas (bokeh) a flutuar devagar, em tons de mel, rosa e azul. */
+  private ambientLights(): void {
+    const tints = [hex(THEME.glowHoney), hex(THEME.glowPink), hex(THEME.glowBlue), hex(THEME.accent)];
+    for (let i = 0; i < 7; i++) {
+      const x = Math.random() * L.W;
+      const y = 120 + Math.random() * (L.H - 400);
+      const c = this.add
+        .image(x, y, 'cloud')
+        .setTint(tints[i % tints.length])
+        .setAlpha(0.18 + Math.random() * 0.14)
+        .setScale(0.4 + Math.random() * 0.7)
+        .setBlendMode(Phaser.BlendModes.ADD);
       this.tweens.add({
         targets: c,
-        x: { from: -150, to: L.W + 150 },
-        duration: speed,
+        x: x + (Math.random() - 0.5) * 120,
+        y: y - 40 - Math.random() * 60,
+        duration: 6000 + Math.random() * 5000,
+        yoyo: true,
         repeat: -1,
-        delay: -Math.random() * speed,
+        ease: 'Sine.easeInOut',
       });
     }
-    // folhas a mexer no relvado
-    for (let i = 0; i < 6; i++) {
-      const leaf = this.add.image(60 + i * 120, L.H * 0.78 + (i % 2) * 40, 'leaf').setScale(1.2).setAngle(-20);
-      this.tweens.add({ targets: leaf, angle: 15, duration: 1400 + i * 120, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-    }
+    // halo suave atrás da Mel
+    const halo = this.add.image(L.W / 2 + 60, L.H * 0.44 - 20, 'cloud').setTint(hex(THEME.glowHoney)).setScale(2.4).setAlpha(0.32).setBlendMode(Phaser.BlendModes.ADD);
+    this.tweens.add({ targets: halo, alpha: 0.2, scale: 2.2, duration: 2600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
   }
 
   private heroBee(): void {
@@ -155,7 +163,7 @@ export class HomeScene extends BaseScene {
       const x = left ? 74 : L.W - 74;
       const y = 220 + (i % 3) * 170;
       const c = this.add.container(x, y);
-      c.add(new Button(this, 0, 0, { round: true, w: 108, color: '#FFF3D6', icon: e.icon, iconSize: 74, onClick: () => e.open(this, () => this.refreshEvents()) }));
+      c.add(new Button(this, 0, 0, { round: true, w: 108, color: COLORS.glass, icon: e.icon, iconSize: 74, onClick: () => e.open(this, () => this.refreshEvents()) }));
       c.add(txt(this, 0, 62, t(`events.${e.id}`), 22));
       const timer = txt(this, 0, 88, '', 20, { stroke: true });
       timer.setName('timer');
@@ -186,7 +194,7 @@ export class HomeScene extends BaseScene {
     void levelDifficulty(app.save.level).then((d) => {
       if (!this.playTag.active) return;
       if (d === 'normal') return;
-      this.playTag.setText(t(`difficulty.${d}`)).setColor(d === 'hard' ? '#F2AB27' : '#E8384F');
+      this.playTag.setText(t(`difficulty.${d}`)).setColor(d === 'hard' ? '#FFB020' : '#FF4D6D');
     });
   }
 
@@ -209,9 +217,10 @@ export class HomeScene extends BaseScene {
   private bottomBar(): void {
     const y = L.H - 92;
     const g = this.add.graphics();
-    g.fillStyle(0x2e2412, 0.3).fillRoundedRect(8, y - 72, L.W - 16, 156, 40);
-    g.fillStyle(0xfffdf6, 1).fillRoundedRect(8, y - 78, L.W - 16, 156, 40);
-    g.lineStyle(5, 0x2e2412).strokeRoundedRect(8, y - 78, L.W - 16, 156, 40);
+    // barra de vidro escuro
+    g.fillStyle(0x07041a, 0.35).fillRoundedRect(8, y - 72, L.W - 16, 156, 40);
+    g.fillStyle(hex(THEME.panelBottom), 0.92).fillRoundedRect(8, y - 78, L.W - 16, 156, 40);
+    g.lineStyle(2, 0xffffff, 0.14).strokeRoundedRect(8, y - 78, L.W - 16, 156, 40);
     const items: [string, string, () => void][] = [
       ['ic_shop', t('home.shop'), () => shopModal(this)],
       ['ic_ranking', t('home.ranking'), () => comingSoonModal(this, t('home.ranking'), 'ic_ranking')],
@@ -224,8 +233,8 @@ export class HomeScene extends BaseScene {
       const home = i === 2;
       if (home) {
         const hl = this.add.graphics();
-        hl.fillStyle(0xf2ab27, 1).fillRoundedRect(x - 66, y - 70, 132, 140, 30);
-        hl.lineStyle(4, 0x2e2412).strokeRoundedRect(x - 66, y - 70, 132, 140, 30);
+        hl.fillStyle(hex(THEME.accent), 0.2).fillRoundedRect(x - 64, y - 68, 128, 136, 30);
+        hl.lineStyle(2, hex(THEME.accent), 0.7).strokeRoundedRect(x - 64, y - 68, 128, 136, 30);
       }
       const ic = this.add.image(x, y - 14 - (home ? 8 : 0), icon).setDisplaySize(home ? 92 : 76, home ? 92 : 76);
       ic.setInteractive({ useHandCursor: true }).on('pointerdown', () => {
@@ -233,7 +242,7 @@ export class HomeScene extends BaseScene {
         this.tweens.add({ targets: ic, scaleX: ic.scaleX * 1.1, scaleY: ic.scaleY * 0.88, duration: 70, yoyo: true });
         fn();
       });
-      txt(this, x, y + 46, label, home ? 24 : 20);
+      txt(this, x, y + 46, label, home ? 24 : 20, { color: home ? THEME.accent : THEME.textMuted, stroke: false, weight: '600' });
     });
   }
 

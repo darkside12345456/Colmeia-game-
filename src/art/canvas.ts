@@ -2,7 +2,10 @@
 // "quase 3D" fofo do jogo.
 export type Ctx = CanvasRenderingContext2D;
 
-export const INK = '#2E2412';
+/** Tinta escura (olhos, detalhes). Não é usada para contornos grossos. */
+export const INK = '#1B1433';
+/** Traço suave para contornos de ícones e formas. */
+export const LINE = 'rgba(20,12,45,0.32)';
 
 export function rr(ctx: Ctx, x: number, y: number, w: number, h: number, r: number): void {
   const k = Math.min(r, w / 2, h / 2);
@@ -42,64 +45,77 @@ export function ellipse(ctx: Ctx, cx: number, cy: number, rx: number, ry: number
   ctx.ellipse(cx, cy, Math.max(0.1, rx), Math.max(0.1, ry), rot, 0, Math.PI * 2);
 }
 
-/** Bloco/peça com relevo: base mais escura em baixo, topo com gradiente e brilho. */
-export function glossyTile(ctx: Ctx, x: number, y: number, w: number, h: number, r: number, color: string, outline = true): void {
-  const depth = Math.max(2, h * 0.1);
-  // base (aresta inferior mais escura)
-  rr(ctx, x, y + depth * 0.5, w, h - depth * 0.5, r);
-  ctx.fillStyle = shade(color, -0.35);
-  ctx.fill();
-  // face
-  const g = ctx.createLinearGradient(0, y, 0, y + h - depth);
-  g.addColorStop(0, shade(color, 0.28));
-  g.addColorStop(0.55, color);
-  g.addColorStop(1, shade(color, -0.08));
-  rr(ctx, x, y, w, h - depth, r);
-  ctx.fillStyle = g;
-  ctx.fill();
-  // brilho
+/** Gema/vidro com brilho: usada nos blocos, peças e botões quadrados. Sem contorno preto. */
+export function glossyTile(ctx: Ctx, x: number, y: number, w: number, h: number, r: number, color: string, outline = false): void {
+  // sombra suave por baixo
   ctx.save();
-  rr(ctx, x, y, w, h - depth, r);
-  ctx.clip();
-  const gl = ctx.createLinearGradient(0, y, 0, y + (h - depth) * 0.5);
-  gl.addColorStop(0, 'rgba(255,255,255,0.55)');
-  gl.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.fillStyle = gl;
-  rr(ctx, x + w * 0.08, y + h * 0.06, w * 0.84, (h - depth) * 0.42, r * 0.7);
-  ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,0.7)';
-  ellipse(ctx, x + w * 0.24, y + h * 0.2, w * 0.09, h * 0.06, -0.5);
+  ctx.shadowColor = 'rgba(8,4,24,0.45)';
+  ctx.shadowBlur = w * 0.14;
+  ctx.shadowOffsetY = h * 0.06;
+  rr(ctx, x, y, w, h, r);
+  ctx.fillStyle = shade(color, -0.3);
   ctx.fill();
   ctx.restore();
-  if (outline) {
-    rr(ctx, x, y, w, h, r);
-    ctx.lineWidth = Math.max(1.5, w * 0.045);
-    ctx.strokeStyle = rgba('#2E2412', 0.55);
-    ctx.stroke();
-  }
+  // corpo com gradiente diagonal
+  const g = ctx.createLinearGradient(x, y, x + w * 0.35, y + h);
+  g.addColorStop(0, shade(color, 0.38));
+  g.addColorStop(0.45, color);
+  g.addColorStop(1, shade(color, -0.25));
+  rr(ctx, x, y, w, h, r);
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.save();
+  rr(ctx, x, y, w, h, r);
+  ctx.clip();
+  // sombra interior em baixo
+  const b = ctx.createLinearGradient(0, y + h * 0.55, 0, y + h);
+  b.addColorStop(0, 'rgba(0,0,0,0)');
+  b.addColorStop(1, 'rgba(10,0,30,0.22)');
+  ctx.fillStyle = b;
+  ctx.fillRect(x, y, w, h);
+  // reflexo de vidro em cima
+  const gl = ctx.createLinearGradient(0, y, 0, y + h * 0.5);
+  gl.addColorStop(0, 'rgba(255,255,255,0.62)');
+  gl.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = gl;
+  rr(ctx, x + w * 0.09, y + h * 0.06, w * 0.82, h * 0.4, r * 0.75);
+  ctx.fill();
+  // brilho pontual
+  ctx.fillStyle = 'rgba(255,255,255,0.85)';
+  ellipse(ctx, x + w * 0.27, y + h * 0.19, w * 0.08, h * 0.05, -0.6);
+  ctx.fill();
+  ctx.restore();
+  // aresta de luz fina
+  rr(ctx, x + 0.75, y + 0.75, w - 1.5, h - 1.5, r);
+  ctx.lineWidth = Math.max(1, w * 0.025);
+  ctx.strokeStyle = outline ? LINE : 'rgba(255,255,255,0.35)';
+  ctx.stroke();
 }
 
 /** Círculo brilhante (moedas, botões redondos, ícones). */
-export function glossyCircle(ctx: Ctx, cx: number, cy: number, r: number, color: string, outline = INK): void {
-  ctx.fillStyle = shade(color, -0.35);
-  ellipse(ctx, cx, cy + r * 0.08, r, r);
+export function glossyCircle(ctx: Ctx, cx: number, cy: number, r: number, color: string, outline: string | null = null): void {
+  ctx.save();
+  ctx.shadowColor = 'rgba(8,4,24,0.4)';
+  ctx.shadowBlur = r * 0.25;
+  ctx.shadowOffsetY = r * 0.1;
+  ctx.fillStyle = shade(color, -0.3);
+  ellipse(ctx, cx, cy + r * 0.04, r, r);
   ctx.fill();
+  ctx.restore();
   const g = ctx.createRadialGradient(cx - r * 0.35, cy - r * 0.4, r * 0.1, cx, cy, r);
   g.addColorStop(0, shade(color, 0.45));
   g.addColorStop(0.6, color);
   g.addColorStop(1, shade(color, -0.12));
   ctx.fillStyle = g;
-  ellipse(ctx, cx, cy, r * 0.97, r * 0.92);
+  ellipse(ctx, cx, cy, r, r);
   ctx.fill();
   ctx.fillStyle = 'rgba(255,255,255,0.6)';
   ellipse(ctx, cx - r * 0.35, cy - r * 0.42, r * 0.28, r * 0.16, -0.6);
   ctx.fill();
-  if (outline) {
-    ctx.lineWidth = Math.max(2, r * 0.1);
-    ctx.strokeStyle = outline;
-    ellipse(ctx, cx, cy + r * 0.04, r, r * 0.98);
-    ctx.stroke();
-  }
+  ctx.lineWidth = Math.max(1, r * 0.04);
+  ctx.strokeStyle = outline ?? 'rgba(255,255,255,0.35)';
+  ellipse(ctx, cx, cy, r - 0.5, r - 0.5);
+  ctx.stroke();
 }
 
 export function star(ctx: Ctx, cx: number, cy: number, r: number, points = 5, inner = 0.5): void {
@@ -123,7 +139,7 @@ export function heartPath(ctx: Ctx, cx: number, cy: number, s: number): void {
   ctx.closePath();
 }
 
-export function strokeFill(ctx: Ctx, fill: string | CanvasGradient, lw: number, stroke = INK): void {
+export function strokeFill(ctx: Ctx, fill: string | CanvasGradient, lw: number, stroke = LINE): void {
   ctx.lineJoin = 'round';
   ctx.lineCap = 'round';
   ctx.lineWidth = lw;

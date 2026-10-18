@@ -1,7 +1,7 @@
 // Janelas que entram com ressalto (escala 0,8 -> 1,05 -> 1), com botão de fechar sempre visível.
 import Phaser from 'phaser';
 import { app } from '../app';
-import { panelTexture, ribbonTexture } from '../art/textures';
+import { buttonTexture, panelTexture } from '../art/textures';
 import { iconButton, COLORS } from './Button';
 import { dur, L, txt } from './core';
 
@@ -43,20 +43,21 @@ export class Modal extends Phaser.GameObjects.Container {
     this.pw = opts.w ?? 620;
     this.ph = opts.h ?? 700;
     this.setDepth(1000 + (stacks.get(scene)?.length ?? 0) * 10);
-    this.dimRect = scene.add.rectangle(0, 0, L.W, L.H, 0x1a1206, opts.dim ?? 0.6).setOrigin(0, 0).setInteractive();
+    this.dimRect = scene.add.rectangle(0, 0, L.W, L.H, 0x07041a, opts.dim ?? 0.7).setOrigin(0, 0).setInteractive();
     this.add(this.dimRect);
     this.panel = scene.add.container(L.W / 2, L.H / 2);
     this.add(this.panel);
     this.panel.add(scene.add.image(0, 0, panelTexture(scene, this.pw, this.ph)));
     if (opts.title) {
-      const rw = Math.min(this.pw + 40, Math.max(420, opts.title.length * 26 + 160));
-      this.panel.add(scene.add.image(0, -this.ph / 2 + 4, ribbonTexture(scene, rw, opts.ribbon ?? COLORS.honey)));
-      const t = txt(scene, 0, -this.ph / 2 - 2, opts.title, 44);
-      if (t.width > rw - 150) t.setScale((rw - 150) / t.width);
+      // etiqueta em pílula a flutuar sobre o topo da janela
+      const rw = Math.min(this.pw - 160, Math.max(300, opts.title.length * 24 + 90));
+      this.panel.add(scene.add.image(0, -this.ph / 2 + 12, buttonTexture(scene, rw, 84, opts.ribbon ?? COLORS.honey)));
+      const t = txt(scene, 0, -this.ph / 2 + 4, opts.title, 40);
+      if (t.width > rw - 60) t.setScale((rw - 60) / t.width);
       this.panel.add(t);
     }
     if (opts.closable !== false) {
-      this.closeBtn = iconButton(scene, this.pw / 2 - 16, -this.ph / 2 + 16, 'ic_close', COLORS.red, () => this.close(), 76);
+      this.closeBtn = iconButton(scene, this.pw / 2 - 30, -this.ph / 2 + 30, 'ic_close', COLORS.glass, () => this.close(), 68);
       this.panel.add(this.closeBtn);
     }
     scene.add.existing(this);

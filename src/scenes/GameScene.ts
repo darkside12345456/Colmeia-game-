@@ -3,7 +3,7 @@
 import Phaser from 'phaser';
 import { app } from '../app';
 import { BEE_COLORS } from '../art/bee';
-import { frameTexture } from '../art/textures';
+import { backgroundTexture, frameTexture } from '../art/textures';
 import { GameEngine, KIND_FLOWER, KIND_STONE, MAX_SLOTS, type Bee, type EngineEvent, type RPiece } from '../core/engine';
 import { colorHex } from '../core/palette';
 import { smartShuffle } from '../core/solver';
@@ -18,6 +18,7 @@ import { Button, COLORS, iconButton } from '../ui/Button';
 import { BaseScene, dur, INK, L, txt } from '../ui/core';
 import { burst, confetti, flash, tutorialHand } from '../ui/fx';
 import { closeTopModal, modalOpen } from '../ui/Modal';
+import { hex, THEME } from '../ui/theme';
 import { badge, toast } from '../ui/widgets';
 import {
   boosterBuyModal,
@@ -123,9 +124,7 @@ export class GameScene extends BaseScene {
     super.create();
     this.engine = new GameEngine(this.level);
     this.hadAttempts = app.save.stats.attemptsOnLevel;
-    this.add.rectangle(0, 0, L.W, L.H, 0xfbf6ea).setOrigin(0, 0);
-    const bg = this.add.graphics();
-    bg.fillGradientStyle(0xcdebfa, 0xcdebfa, 0xfbf6ea, 0xfbf6ea, 1).fillRect(0, 0, L.W, L.H * 0.5);
+    this.add.image(0, 0, backgroundTexture(this, L.W, L.H)).setOrigin(0, 0);
     this.layout();
     this.buildTop();
     this.buildBoard();
@@ -155,8 +154,8 @@ export class GameScene extends BaseScene {
   private drawFakeBanner(): void {
     if (!(app.ads instanceof FakeAdService) || !app.ads.bannerVisible || !this.sys.isActive()) return;
     const h = this.bannerSpace() - 12;
-    this.add.rectangle(0, L.H - h, L.W, h, 0x2e2412).setOrigin(0, 0).setDepth(90);
-    txt(this, L.W / 2, L.H - h / 2, t('ads.fakeBanner'), 26, { stroke: false, color: '#FBF6EA', body: true }).setDepth(91);
+    this.add.rectangle(0, L.H - h, L.W, h, 0x07041a).setOrigin(0, 0).setDepth(90);
+    txt(this, L.W / 2, L.H - h / 2, t('ads.fakeBanner'), 26, { stroke: false, color: THEME.textMuted, body: true }).setDepth(91);
   }
 
   // ------------------------------------------------------------------ layout
@@ -200,7 +199,7 @@ export class GameScene extends BaseScene {
     txt(this, L.W / 2, 50, t('common.level', { n: this.level.id }), 46).setDepth(50);
     const diff = this.level.difficulty;
     if (diff !== 'normal') {
-      txt(this, L.W / 2, 94, t(`difficulty.${diff}`), 26, { color: diff === 'hard' ? '#F2AB27' : '#E8384F' }).setDepth(50);
+      txt(this, L.W / 2, 94, t(`difficulty.${diff}`), 26, { color: diff === 'hard' ? '#FFB020' : '#FF4D6D' }).setDepth(50);
     }
     this.speedGlow = this.add.image(L.W - 66, 62, 'px_dot').setDisplaySize(160, 160).setTint(0x8fd3ff).setAlpha(0).setDepth(49);
     this.speedBtn = new Button(this, L.W - 66, 60, {
@@ -243,7 +242,8 @@ export class GameScene extends BaseScene {
     const bw = this.cell * w;
     const bh = this.cell * h;
     this.add.image(L.W / 2, this.by + bh / 2 + 4, frameTexture(this, Math.round(bw + 44), Math.round(bh + 52))).setDepth(5);
-    this.add.image(this.door.x, this.door.y + 6, 'hive_door').setDisplaySize(200, 110).setDepth(6);
+    // portal da colmeia pousado na borda da bandeja (por cima do vidro, por baixo das ranhuras)
+    this.add.image(this.door.x, this.door.y - 8, 'hive_door').setDisplaySize(180, 98).setDepth(20.5);
     const e = this.engine;
     const blockSize = this.cell * 0.98;
     for (let i = 0; i < w * h; i++) {
@@ -290,9 +290,10 @@ export class GameScene extends BaseScene {
 
   private buildTray(): void {
     const g = this.add.graphics().setDepth(20);
-    g.fillStyle(0x2e2412, 0.25).fillRoundedRect(10, this.trayY - 66, L.W - 20, 140, 36);
-    g.fillStyle(0xf2ead3, 1).fillRoundedRect(10, this.trayY - 70, L.W - 20, 136, 36);
-    g.lineStyle(4, 0x2e2412, 0.6).strokeRoundedRect(10, this.trayY - 70, L.W - 20, 136, 36);
+    // bandeja de vidro escuro
+    g.fillStyle(0x07041a, 0.3).fillRoundedRect(10, this.trayY - 64, L.W - 20, 140, 36);
+    g.fillStyle(0x07041a, 0.5).fillRoundedRect(10, this.trayY - 70, L.W - 20, 136, 36);
+    g.lineStyle(2, 0xffffff, 0.14).strokeRoundedRect(10, this.trayY - 70, L.W - 20, 136, 36);
     this.layoutSlots(false);
   }
 
@@ -358,7 +359,7 @@ export class GameScene extends BaseScene {
         this.setHidden(v, p.hidden && !front);
         v.c.setDepth(30 - depth);
         const alpha = front ? 1 : 0.55;
-        v.img.setTint(front ? 0xffffff : 0xd8d0c0);
+        v.img.setTint(front ? 0xffffff : 0xb4acd6);
         if (!animate || isNew) {
           v.c.setPosition(x, isNew && animate ? y + 60 : y).setScale(scale).setAlpha(isNew && animate ? 0 : alpha);
           if (isNew && animate) this.tweens.add({ targets: v.c, y, alpha, duration: dur(260), ease: 'Quad.easeOut' });
@@ -387,8 +388,8 @@ export class GameScene extends BaseScene {
         const a = pos(p.id);
         const b = pos(p.twin);
         if (a && b && e.slotOf(p.id) < 0 && e.slotOf(p.twin) < 0 && a.visible && b.visible) {
-          g.lineStyle(20, 0x2e2412, 1).lineBetween(a.x, a.y, b.x, b.y);
-          g.lineStyle(12, 0xf2ab27, 1).lineBetween(a.x, a.y, b.x, b.y);
+          g.lineStyle(20, 0x07041a, 0.45).lineBetween(a.x, a.y, b.x, b.y);
+          g.lineStyle(12, 0xffb020, 1).lineBetween(a.x, a.y, b.x, b.y);
           g.fillStyle(0xffffff, 0.6).fillCircle((a.x + b.x) / 2, (a.y + b.y) / 2, 5);
         }
       }
@@ -396,7 +397,7 @@ export class GameScene extends BaseScene {
         const a = pos(p.id);
         const b = pos(p.tubeChild);
         if (a && b) {
-          g.lineStyle(30, 0x2e2412, 0.9).lineBetween(a.x, a.y, b.x, b.y);
+          g.lineStyle(30, 0x07041a, 0.45).lineBetween(a.x, a.y, b.x, b.y);
           g.lineStyle(20, 0x8fd3ff, 0.85).lineBetween(a.x, a.y, b.x, b.y);
           g.lineStyle(6, 0xffffff, 0.6).lineBetween(a.x - 5, a.y, b.x - 5, b.y);
         }
@@ -644,7 +645,7 @@ export class GameScene extends BaseScene {
       const label = t(names[Math.min(this.combo - 1, names.length - 1)]);
       app.audio.play('combo', this.combo);
       const ct = txt(this, L.W / 2, this.trayY - 120, label, 64 + Math.min(this.combo, 4) * 6, {
-        color: ['#F2AB27', '#F2059F', '#0293F2', '#54C143'][Math.min(this.combo - 1, 3)],
+        color: ['#FFB020', '#FF4FA3', '#4F7BFF', '#22C98A'][Math.min(this.combo - 1, 3)],
       }).setDepth(200);
       ct.setScale(0.3);
       this.tweens.add({ targets: ct, scale: 1, duration: dur(260), ease: 'Back.easeOut' });
@@ -659,7 +660,7 @@ export class GameScene extends BaseScene {
     lab?.destroy();
     this.stoneLabels.delete(cell);
     const { x, y } = this.cellPos(cell);
-    burst(this, x, y, 0x5b4a3a, 10, 12);
+    burst(this, x, y, 0x9a94b8, 10, 12);
     if (img) {
       img.setTexture(`block_${this.level.colors[this.engine.color[cell]]}`);
       this.tweens.add({ targets: img, angle: { from: -15, to: 0 }, duration: dur(260), ease: 'Back.easeOut' });
@@ -774,7 +775,7 @@ export class GameScene extends BaseScene {
     const y = this.boostersY;
     BOOSTERS.forEach((id, i) => {
       const x = L.W / 2 + (i - 1.5) * 168;
-      const btn = new Button(this, x, y, { w: 140, h: 104, color: '#FFFFFF', icon: `ic_${id}`, iconSize: 78, onClick: () => this.onBooster(id) });
+      const btn = new Button(this, x, y, { w: 140, h: 104, color: COLORS.glass, icon: `ic_${id}`, iconSize: 78, onClick: () => this.onBooster(id) });
       btn.setDepth(80);
       const b = badge(this, x + 56, y - 40, '0').setDepth(81);
       this.tweens.killTweensOf(b);
@@ -794,13 +795,13 @@ export class GameScene extends BaseScene {
         b.add(txt(this, -56, 70, t('boosters.lockedAt', { n: config().boosters.unlockLevel[id] }), 20, { color: INK, stroke: false }));
       } else {
         const g = this.add.graphics();
-        g.fillStyle(0x2e2412, 1).fillCircle(0, 2, 22);
-        g.fillStyle(n > 0 ? 0x0293f2 : 0x54c143, 1).fillCircle(0, 0, 20);
+        g.fillStyle(n > 0 ? 0x4f7bff : 0x22c98a, 1).fillCircle(0, 0, 20);
+        g.lineStyle(2, 0xffffff, 0.5).strokeCircle(0, 0, 20);
         b.add(g);
         if (n > 0) b.add(txt(this, 0, -2, String(n), 26, { stroke: false }));
         else b.add(this.add.image(0, 0, 'ic_plus').setDisplaySize(30, 30));
       }
-      btn.bg.setTint(this.mode !== null && ((this.mode === 'tweezers' && id === 'tweezers') || (this.mode === 'magnet' && id === 'magnet')) ? 0xbfe6ff : 0xffffff);
+      btn.bg.setTint(this.mode !== null && ((this.mode === 'tweezers' && id === 'tweezers') || (this.mode === 'magnet' && id === 'magnet')) ? 0x9fd0ff : 0xffffff);
     }
   }
 
@@ -877,7 +878,8 @@ export class GameScene extends BaseScene {
     const c = this.add.container(L.W / 2, this.boostersY - 110).setDepth(300);
     const w = Math.min(690, colors.length * 86 + 40);
     const g = this.add.graphics();
-    g.fillStyle(0x2e2412, 0.9).fillRoundedRect(-w / 2, -70, w, 140, 30);
+    g.fillStyle(hex(THEME.panelBottom), 0.96).fillRoundedRect(-w / 2, -70, w, 140, 30);
+    g.lineStyle(2, 0xffffff, 0.16).strokeRoundedRect(-w / 2, -70, w, 140, 30);
     c.add(g);
     c.add(txt(this, 0, -48, t('game.pickColor'), 26));
     colors.forEach((col, i) => {

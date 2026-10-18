@@ -1,8 +1,7 @@
 // Arranque da app: fontes, gravação, serviços e jogo Phaser.
-import '@fontsource/baloo-2/latin-700.css';
-import '@fontsource/baloo-2/latin-800.css';
-import '@fontsource/nunito/latin-700.css';
-import '@fontsource/nunito/latin-800.css';
+import '@fontsource/outfit/latin-500.css';
+import '@fontsource/outfit/latin-600.css';
+import '@fontsource/outfit/latin-700.css';
 import Phaser from 'phaser';
 import { app } from './app';
 import { BootScene } from './scenes/BootScene';
@@ -11,7 +10,7 @@ import { HomeScene } from './scenes/HomeScene';
 import { computeLayout, L } from './ui/core';
 
 async function loadFonts(): Promise<void> {
-  const fonts = ['800 40px "Baloo 2"', '700 40px "Baloo 2"', '700 20px "Nunito"', '800 20px "Nunito"'];
+  const fonts = ['500 20px "Outfit"', '600 20px "Outfit"', '700 40px "Outfit"'];
   const timeout = new Promise((r) => setTimeout(r, 3000));
   await Promise.race([Promise.all(fonts.map((f) => document.fonts.load(f))), timeout]);
 }
@@ -22,7 +21,7 @@ async function start(): Promise<void> {
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
-    backgroundColor: '#FBF6EA',
+    backgroundColor: '#26154A',
     width: Math.round(L.W * L.K),
     height: Math.round(L.H * L.K),
     scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },

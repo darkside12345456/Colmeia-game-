@@ -16,15 +16,16 @@ if (js.includes('</script')) throw new Error('o JS contém </script');
 
 const page = `<title>Colmeia Doce</title>
 <style>
-  /* Jogo de ecrã inteiro com um só visual (creme/mel), igual em tema claro e escuro */
-  :root { --bg: #FBF6EA; --ink: #2E2412; --honey: #F7B92E; color-scheme: light; }
+  /* Jogo de ecrã inteiro com um só visual (noite índigo/mel), igual em tema claro e escuro */
+  :root { --bg: #26154A; --ink: #F5F2FF; --honey: #FFC23D; color-scheme: dark; }
   html, body { height: 100%; }
-  body { margin: 0; background: var(--bg); color: var(--ink); overflow: hidden; overscroll-behavior: none;
+  body { margin: 0; background: linear-gradient(#120D2E, var(--bg) 55%, #43205A); color: var(--ink); overflow: hidden; overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; touch-action: none; }
   #game { position: fixed; left: 0; right: 0; top: env(safe-area-inset-top, 0px); bottom: env(safe-area-inset-bottom, 0px);
     display: flex; align-items: center; justify-content: center; }
   #loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
-  #loading .dot { width: 64px; height: 64px; border-radius: 50%; background: var(--honey); border: 5px solid var(--ink);
+  #loading .dot { width: 64px; height: 64px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #FFE29A, var(--honey) 55%, #E8961E);
+    box-shadow: 0 0 40px rgba(255,182,39,.55);
     animation: b 0.9s ease-in-out infinite alternate; }
   @keyframes b { from { transform: translateY(0) } to { transform: translateY(-18px) } }
   @media (prefers-reduced-motion: reduce) { #loading .dot { animation: none; } }

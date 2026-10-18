@@ -40,6 +40,7 @@ import {
 } from '../meta/events';
 import { Button, COLORS, iconButton } from '../ui/Button';
 import { INK, L, txt } from '../ui/core';
+import { hex, THEME } from '../ui/theme';
 import { hiveView } from '../ui/hive';
 import { Modal } from '../ui/Modal';
 import { ProgressBar, rewardRow, ScrollArea, toast } from '../ui/widgets';
@@ -87,7 +88,7 @@ export function dailyModal(scene: Phaser.Scene, onChange: () => void): void {
     const y = -230 + row * 220;
     const isToday = i === s.daily.index && avail;
     const done = i < s.daily.index;
-    const card = scene.add.image(x, y, cardTexture(scene, 128, 190, isToday ? '#B8F0A8' : i === 6 ? '#FFE7A8' : '#FFFFFF'));
+    const card = scene.add.image(x, y, cardTexture(scene, 128, 190, isToday ? '#22C98A' : i === 6 ? THEME.accent : THEME.card));
     m.addContent(card);
     if (isToday) scene.tweens.add({ targets: card, scale: 1.06, duration: 500, yoyo: true, repeat: -1 });
     m.addContent(txt(scene, x, y - 70, t('daily.day', { n: i + 1 }), 24, { color: INK, stroke: false }));
@@ -141,9 +142,9 @@ export function passModal(scene: Phaser.Scene, onChange?: () => void): void {
   // bilhetes e progresso
   m.addContent(scene.add.image(-230, -h / 2 + 140, 'ic_ticket').setDisplaySize(70, 70));
   m.addContent(txt(scene, -150, -h / 2 + 140, t('pass.tickets', { n: s.pass.tickets }), 28, { origin: [0, 0.5] }));
-  const bar = new ProgressBar(scene, 150, -h / 2 + 140, 220, 26, 0x8302d2).set((s.pass.tickets % TICKETS_PER_TIER) / TICKETS_PER_TIER);
+  const bar = new ProgressBar(scene, 150, -h / 2 + 140, 220, 26, 0x8b5cf6).set((s.pass.tickets % TICKETS_PER_TIER) / TICKETS_PER_TIER);
   m.addContent(bar);
-  if (premium) m.addContent(txt(scene, 0, -h / 2 + 200, t('pass.owned'), 30, { color: '#F2AB27' }));
+  if (premium) m.addContent(txt(scene, 0, -h / 2 + 200, t('pass.owned'), 30, { color: '#FFB020' }));
   else {
     m.addContent(
       new Button(scene, 0, -h / 2 + 205, {
@@ -158,7 +159,7 @@ export function passModal(scene: Phaser.Scene, onChange?: () => void): void {
     );
   }
   m.addContent(txt(scene, -150, -h / 2 + 270, t('pass.free'), 28));
-  m.addContent(txt(scene, 150, -h / 2 + 270, t('pass.premium'), 28, { color: '#F2AB27' }));
+  m.addContent(txt(scene, 150, -h / 2 + 270, t('pass.premium'), 28, { color: '#FFB020' }));
   const areaTop = -h / 2 + 300;
   const areaH = h / 2 - 40 - areaTop;
   const area = new ScrollArea(scene, 0, areaTop + areaH / 2, 620, areaH);
@@ -169,15 +170,15 @@ export function passModal(scene: Phaser.Scene, onChange?: () => void): void {
     const y = k * rowH + rowH / 2;
     const reached = k < tier;
     const g = scene.add.graphics();
-    g.fillStyle(reached ? 0x8302d2 : 0x9aa3ad, 1).fillCircle(0, y, 30);
-    g.lineStyle(4, 0x2e2412).strokeCircle(0, y, 30);
-    if (k < PASS_TIERS - 1) g.lineStyle(10, reached ? 0x8302d2 : 0xd9cfb6).lineBetween(0, y + 30, 0, y + rowH - 30);
+    g.fillStyle(reached ? 0x8b5cf6 : 0x5a5480, 1).fillCircle(0, y, 30);
+    g.lineStyle(2, 0xffffff, 0.3).strokeCircle(0, y, 30);
+    if (k < PASS_TIERS - 1) g.lineStyle(10, reached ? 0x8b5cf6 : 0x463c82).lineBetween(0, y + 30, 0, y + rowH - 30);
     c.add(g);
     c.add(txt(scene, 0, y - 2, String(k + 1), 28));
     for (const prem of [false, true]) {
       const x = prem ? 160 : -160;
       const r = prem ? passPremiumReward(k) : passFreeReward(k);
-      c.add(scene.add.image(x, y, cardTexture(scene, 230, 120, prem ? '#FFE7A8' : '#FFFFFF')));
+      c.add(scene.add.image(x, y, cardTexture(scene, 230, 120, prem ? THEME.accent : THEME.card)));
       const [icon, label] = mainReward(r);
       c.add(scene.add.image(x - 60, y - 4, icon).setDisplaySize(64, 64));
       c.add(txt(scene, x - 60, y + 34, label, 22));
@@ -229,10 +230,10 @@ export function treasureModal(scene: Phaser.Scene, onChange?: () => void): void 
     const y = i * stepH + stepH / 2 + 10;
     if (i < TREASURE_STEPS.length - 1) {
       const nx = (i + 1) % 2 === 0 ? -90 : 90;
-      g.lineStyle(12, 0xd9cfb6).lineBetween(x, y, nx, y + stepH);
+      g.lineStyle(12, 0x463c82).lineBetween(x, y, nx, y + stepH);
     }
     const state = i < s.treasure.step ? 'done' : i === s.treasure.step ? 'current' : 'locked';
-    const color = step.kind === 'paid' ? '#FFE7A8' : step.kind === 'video' ? '#D7F0FF' : '#FFFFFF';
+    const color = step.kind === 'paid' ? THEME.accent : step.kind === 'video' ? '#4F7BFF' : THEME.card;
     const card = scene.add.image(x, y, cardTexture(scene, 300, 160, color)).setAlpha(state === 'locked' ? 0.6 : 1);
     c.add(card);
     const row = rewardRow(scene, step.reward, 46, 20);
@@ -312,8 +313,8 @@ export function raceModal(scene: Phaser.Scene, onChange?: () => void): void {
   lanes.forEach((ln, i) => {
     const y = -300 + i * 120;
     const g = scene.add.graphics();
-    g.fillStyle(i === 0 ? 0xfff3d6 : 0xffffff, 1).fillRoundedRect(-300, y - 50, 600, 100, 24);
-    g.lineStyle(3, 0x2e2412, 0.4).strokeRoundedRect(-300, y - 50, 600, 100, 24);
+    g.fillStyle(i === 0 ? hex(THEME.accent) : 0xffffff, i === 0 ? 0.16 : 0.06).fillRoundedRect(-300, y - 50, 600, 100, 24);
+    g.lineStyle(2, i === 0 ? hex(THEME.accent) : 0xffffff, i === 0 ? 0.6 : 0.14).strokeRoundedRect(-300, y - 50, 600, 100, 24);
     m.addContent(g);
     m.addContent(scene.add.image(-250, y, ln.tex).setDisplaySize(80, 80));
     m.addContent(txt(scene, -200, y - 26, ln.name, 22, { origin: [0, 0.5], color: INK, stroke: false }));
@@ -325,7 +326,7 @@ export function raceModal(scene: Phaser.Scene, onChange?: () => void): void {
   });
   if (st === 'running') return;
   const msg = st === 'won' ? t('race.won') : st === 'lost' ? t('race.lost') : t('race.expired');
-  m.addContent(txt(scene, 0, 330, msg, 32, { color: st === 'won' ? '#54C143' : INK, stroke: st === 'won' }));
+  m.addContent(txt(scene, 0, 330, msg, 32, { color: st === 'won' ? '#22C98A' : INK, stroke: st === 'won' }));
   m.addContent(
     new Button(scene, 0, 420, {
       w: 420,
@@ -350,14 +351,13 @@ export function sunflowerModal(scene: Phaser.Scene, onChange?: () => void): void
   const h = Math.min(1150, L.H - 90);
   const m = new Modal(scene, { w: 640, h, title: t('sunflower.title'), ribbon: COLORS.honey, onClose: onChange });
   header(scene, m, () => sunflowerEnds(app.now()), t('sunflower.title'), t('sunflower.rules'), 'ic_sunflower');
-  m.addContent(txt(scene, 0, -h / 2 + 120, t('sunflower.steps', { n: s.sunflower.steps }), 34));
+  m.addContent(txt(scene, 110, -h / 2 + 150, t('sunflower.steps', { n: s.sunflower.steps }), 34));
   const top = -h / 2 + 200;
   const bottom = h / 2 - 70;
   const n = SUNFLOWER_MILESTONES.length;
   const stepY = (bottom - top) / (n - 1);
   const g = scene.add.graphics();
-  g.lineStyle(26, 0x2e2412).lineBetween(-100, top, -100, bottom);
-  g.lineStyle(18, 0x54c143).lineBetween(-100, top, -100, bottom);
+  g.lineStyle(18, 0x22c98a, 0.85).lineBetween(-100, top, -100, bottom);
   m.addContent(g);
   m.addContent(scene.add.image(-100, top - 40, 'ic_sunflower').setDisplaySize(150, 150));
   const claimable = sunflowerClaimable(s, app.now());
@@ -365,8 +365,8 @@ export function sunflowerModal(scene: Phaser.Scene, onChange?: () => void): void
     const y = bottom - i * stepY;
     const reached = s.sunflower.steps >= ms;
     const node = scene.add.graphics();
-    node.fillStyle(reached ? 0xf2ab27 : 0xffffff, 1).fillCircle(-100, y, 34);
-    node.lineStyle(4, 0x2e2412).strokeCircle(-100, y, 34);
+    node.fillStyle(reached ? 0xffb020 : 0x463c82, 1).fillCircle(-100, y, 34);
+    node.lineStyle(2, 0xffffff, 0.35).strokeCircle(-100, y, 34);
     m.addContent(node);
     m.addContent(txt(scene, -100, y - 2, String(ms), 28));
     m.addContent(scene.add.image(-10, y, cardTexture(scene, 120, 90)).setOrigin(0, 0.5));

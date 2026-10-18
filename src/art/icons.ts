@@ -1,9 +1,12 @@
 // Ícones desenhados por código (estilo cartoon com contorno escuro e brilho).
-import { ellipse, glossyCircle, glossyTile, heartPath, INK, rr, shade, star, strokeFill, type Ctx } from './canvas';
+import { ellipse, glossyCircle, glossyTile, heartPath, rr, shade, star, strokeFill, type Ctx } from './canvas';
+
+/** Traço dos ícones: suave, sem contorno preto grosso. */
+const INK = 'rgba(20,12,45,0.38)';
 
 type IconFn = (ctx: Ctx, s: number) => void;
 
-const lwOf = (s: number) => Math.max(2, s * 0.06);
+const lwOf = (s: number) => Math.max(1.2, s * 0.028);
 
 function lg(ctx: Ctx, y0: number, y1: number, c: string): CanvasGradient {
   const g = ctx.createLinearGradient(0, y0, 0, y1);
@@ -46,7 +49,7 @@ export const ICONS: Record<string, IconFn> = {
   },
   heart: (ctx, s) => {
     heartPath(ctx, s / 2, s * 0.52, s * 0.42);
-    strokeFill(ctx, lg(ctx, s * 0.1, s * 0.9, '#E8384F'), lwOf(s));
+    strokeFill(ctx, lg(ctx, s * 0.1, s * 0.9, '#FF4D6D'), lwOf(s));
     ctx.fillStyle = 'rgba(255,255,255,0.6)';
     ellipse(ctx, s * 0.33, s * 0.36, s * 0.08, s * 0.05, -0.6);
     ctx.fill();
@@ -96,7 +99,7 @@ export const ICONS: Record<string, IconFn> = {
     }
   },
   info: (ctx, s) => {
-    glossyCircle(ctx, s / 2, s / 2, s * 0.4, '#0293F2');
+    glossyCircle(ctx, s / 2, s / 2, s * 0.4, '#4F7BFF');
     ctx.fillStyle = '#FFFFFF';
     ellipse(ctx, s / 2, s * 0.31, s * 0.06, s * 0.06);
     ctx.fill();
@@ -118,7 +121,7 @@ export const ICONS: Record<string, IconFn> = {
     ctx.lineTo(s * 0.5, s * 0.5);
     ctx.lineTo(s * 0.33, s * 0.62);
     ctx.closePath();
-    ctx.fillStyle = '#E8384F';
+    ctx.fillStyle = '#FF4D6D';
     ctx.fill();
   },
   lock: (ctx, s) => {
@@ -131,7 +134,7 @@ export const ICONS: Record<string, IconFn> = {
     ctx.strokeStyle = '#B9C2CC';
     ctx.stroke();
     rr(ctx, s * 0.22, s * 0.42, s * 0.56, s * 0.42, s * 0.08);
-    strokeFill(ctx, lg(ctx, s * 0.42, s * 0.84, '#F2AB27'), lwOf(s));
+    strokeFill(ctx, lg(ctx, s * 0.42, s * 0.84, '#FFB020'), lwOf(s));
     ellipse(ctx, s / 2, s * 0.6, s * 0.05, s * 0.06);
     ctx.fillStyle = INK;
     ctx.fill();
@@ -172,7 +175,7 @@ export const ICONS: Record<string, IconFn> = {
   slot: (ctx, s) => {
     glossyTile(ctx, s * 0.1, s * 0.16, s * 0.62, s * 0.66, s * 0.14, '#FFFFFF');
     ellipse(ctx, s * 0.72, s * 0.7, s * 0.22, s * 0.22);
-    strokeFill(ctx, '#54C143', lwOf(s));
+    strokeFill(ctx, '#22C98A', lwOf(s));
     ctx.fillStyle = '#FFFFFF';
     rr(ctx, s * 0.69, s * 0.57, s * 0.06, s * 0.26, s * 0.02);
     ctx.fill();
@@ -198,8 +201,8 @@ export const ICONS: Record<string, IconFn> = {
       ctx.closePath();
       strokeFill(ctx, col, lwOf(s));
     };
-    arrow(0.3, 0.7, '#0293F2');
-    arrow(0.7, 0.3, '#F2059F');
+    arrow(0.3, 0.7, '#4F7BFF');
+    arrow(0.7, 0.3, '#FF4FA3');
   },
   tweezers: (ctx, s) => {
     for (const dir of [-1, 1]) {
@@ -214,7 +217,7 @@ export const ICONS: Record<string, IconFn> = {
       ctx.strokeStyle = '#C9D1D9';
       ctx.stroke();
     }
-    glossyTile(ctx, s * 0.38, s * 0.72, s * 0.24, s * 0.22, s * 0.05, '#F2059F');
+    glossyTile(ctx, s * 0.38, s * 0.72, s * 0.24, s * 0.22, s * 0.05, '#FF4FA3');
   },
   magnet: (ctx, s) => {
     ctx.beginPath();
@@ -223,24 +226,24 @@ export const ICONS: Record<string, IconFn> = {
     ctx.strokeStyle = INK;
     ctx.stroke();
     ctx.lineWidth = s * 0.15;
-    ctx.strokeStyle = '#E8384F';
+    ctx.strokeStyle = '#FF4D6D';
     ctx.stroke();
     for (const x of [0.22, 0.78]) {
       rr(ctx, s * x - s * 0.09, s * 0.16, s * 0.18, s * 0.16, s * 0.03);
       strokeFill(ctx, '#E6EBF0', lwOf(s) * 0.8);
     }
-    petalFlower(ctx, s / 2, s * 0.62, s * 0.2, '#F7A8CF', '#F2AB27', lwOf(s) * 0.7);
+    petalFlower(ctx, s / 2, s * 0.62, s * 0.2, '#F7A8CF', '#FFB020', lwOf(s) * 0.7);
   },
   gift: (ctx, s) => {
     rr(ctx, s * 0.14, s * 0.4, s * 0.72, s * 0.48, s * 0.06);
-    strokeFill(ctx, lg(ctx, s * 0.4, s * 0.9, '#0293F2'), lwOf(s));
+    strokeFill(ctx, lg(ctx, s * 0.4, s * 0.9, '#4F7BFF'), lwOf(s));
     rr(ctx, s * 0.1, s * 0.28, s * 0.8, s * 0.16, s * 0.05);
-    strokeFill(ctx, lg(ctx, s * 0.28, s * 0.44, '#0FBF9F'), lwOf(s));
+    strokeFill(ctx, lg(ctx, s * 0.28, s * 0.44, '#14C8B4'), lwOf(s));
     rr(ctx, s * 0.43, s * 0.28, s * 0.14, s * 0.6, 0);
-    strokeFill(ctx, '#F2059F', lwOf(s) * 0.7);
+    strokeFill(ctx, '#FF4FA3', lwOf(s) * 0.7);
     for (const dir of [-1, 1]) {
       ellipse(ctx, s * (0.5 + dir * 0.13), s * 0.2, s * 0.13, s * 0.08, dir * 0.4);
-      strokeFill(ctx, '#F2059F', lwOf(s));
+      strokeFill(ctx, '#FF4FA3', lwOf(s));
     }
   },
   chest: (ctx, s) => {
@@ -252,7 +255,7 @@ export const ICONS: Record<string, IconFn> = {
     ctx.closePath();
     strokeFill(ctx, lg(ctx, s * 0.2, s * 0.44, '#D1822C'), lwOf(s));
     rr(ctx, s * 0.1, s * 0.4, s * 0.8, s * 0.08, 0);
-    strokeFill(ctx, '#F2AB27', lwOf(s) * 0.7);
+    strokeFill(ctx, '#FFB020', lwOf(s) * 0.7);
     rr(ctx, s * 0.42, s * 0.42, s * 0.16, s * 0.18, s * 0.03);
     strokeFill(ctx, '#F7D154', lwOf(s) * 0.7);
   },
@@ -261,7 +264,7 @@ export const ICONS: Record<string, IconFn> = {
     ctx.translate(s / 2, s / 2);
     ctx.rotate(-0.35);
     rr(ctx, -s * 0.38, -s * 0.22, s * 0.76, s * 0.44, s * 0.06);
-    strokeFill(ctx, lg(ctx, -s * 0.22, s * 0.22, '#F2AB27'), lwOf(s));
+    strokeFill(ctx, lg(ctx, -s * 0.22, s * 0.22, '#FFB020'), lwOf(s));
     ctx.setLineDash([s * 0.05, s * 0.05]);
     ctx.beginPath();
     ctx.moveTo(s * 0.14, -s * 0.2);
@@ -280,11 +283,11 @@ export const ICONS: Record<string, IconFn> = {
     strokeFill(ctx, '#FFFFFF', lwOf(s));
     ctx.fillStyle = INK;
     for (let i = 0; i < 4; i++) for (let j = 0; j < 3; j++) if ((i + j) % 2 === 0) ctx.fillRect(s * (0.29 + i * 0.13), s * (0.16 + j * 0.115), s * 0.13, s * 0.115);
-    petalFlower(ctx, s * 0.72, s * 0.75, s * 0.16, '#F2059F', '#F2AB27', lwOf(s) * 0.6);
+    petalFlower(ctx, s * 0.72, s * 0.75, s * 0.16, '#FF4FA3', '#FFB020', lwOf(s) * 0.6);
   },
   sunflower: (ctx, s) => {
     rr(ctx, s * 0.47, s * 0.5, s * 0.06, s * 0.45, s * 0.03);
-    strokeFill(ctx, '#54C143', lwOf(s) * 0.6);
+    strokeFill(ctx, '#22C98A', lwOf(s) * 0.6);
     for (let k = 0; k < 12; k++) {
       const a = (k / 12) * Math.PI * 2;
       ellipse(ctx, s / 2 + Math.cos(a) * s * 0.24, s * 0.4 + Math.sin(a) * s * 0.24, s * 0.12, s * 0.06, a);
@@ -316,11 +319,11 @@ export const ICONS: Record<string, IconFn> = {
     ctx.closePath();
     strokeFill(ctx, lg(ctx, s * 0.18, s * 0.76, '#F7C531'), lwOf(s));
     ellipse(ctx, s / 2, s * 0.6, s * 0.07, s * 0.07);
-    strokeFill(ctx, '#F2059F', lwOf(s) * 0.5);
+    strokeFill(ctx, '#FF4FA3', lwOf(s) * 0.5);
   },
   shop: (ctx, s) => {
     rr(ctx, s * 0.16, s * 0.34, s * 0.68, s * 0.54, s * 0.08);
-    strokeFill(ctx, lg(ctx, s * 0.34, s * 0.88, '#F2059F'), lwOf(s));
+    strokeFill(ctx, lg(ctx, s * 0.34, s * 0.88, '#FF4FA3'), lwOf(s));
     ctx.beginPath();
     ctx.arc(s / 2, s * 0.36, s * 0.16, Math.PI, 0);
     ctx.lineWidth = s * 0.09;
@@ -350,7 +353,7 @@ export const ICONS: Record<string, IconFn> = {
     ctx.lineTo(s * 0.5, s * 0.12);
     ctx.lineTo(s * 0.92, s * 0.5);
     ctx.closePath();
-    strokeFill(ctx, lg(ctx, s * 0.12, s * 0.5, '#E8384F'), lwOf(s));
+    strokeFill(ctx, lg(ctx, s * 0.12, s * 0.5, '#FF4D6D'), lwOf(s));
     rr(ctx, s * 0.2, s * 0.48, s * 0.6, s * 0.4, s * 0.04);
     strokeFill(ctx, lg(ctx, s * 0.48, s * 0.88, '#F7D9A0'), lwOf(s));
     rr(ctx, s * 0.42, s * 0.62, s * 0.16, s * 0.26, s * 0.04);
@@ -370,9 +373,9 @@ export const ICONS: Record<string, IconFn> = {
   },
   collection: (ctx, s) => {
     for (const [rot, c] of [
-      [-0.3, '#0293F2'],
-      [0, '#54C143'],
-      [0.3, '#F2059F'],
+      [-0.3, '#4F7BFF'],
+      [0, '#22C98A'],
+      [0.3, '#FF4FA3'],
     ] as const) {
       ctx.save();
       ctx.translate(s / 2, s * 0.8);
@@ -398,7 +401,7 @@ export const ICONS: Record<string, IconFn> = {
     rr(ctx, -s * 0.2, -s * 0.1, s * 0.4, s * 0.4, s * 0.14);
     strokeFill(ctx, '#FFFFFF', lwOf(s));
     rr(ctx, -s * 0.16, s * 0.26, s * 0.32, s * 0.16, s * 0.04);
-    strokeFill(ctx, '#0293F2', lwOf(s));
+    strokeFill(ctx, '#4F7BFF', lwOf(s));
     ctx.restore();
   },
   infinite: (ctx, s) => {
@@ -572,7 +575,7 @@ export const ICONS: Record<string, IconFn> = {
     ctx.quadraticCurveTo(s * 0.1, s * 0.15, s * 0.85, s * 0.15);
     ctx.quadraticCurveTo(s * 0.85, s * 0.85, s * 0.15, s * 0.85);
     ctx.closePath();
-    strokeFill(ctx, lg(ctx, s * 0.15, s * 0.85, '#54C143'), lwOf(s));
+    strokeFill(ctx, lg(ctx, s * 0.15, s * 0.85, '#22C98A'), lwOf(s));
     ctx.beginPath();
     ctx.moveTo(s * 0.2, s * 0.8);
     ctx.lineTo(s * 0.7, s * 0.3);
@@ -582,5 +585,5 @@ export const ICONS: Record<string, IconFn> = {
   avatar: (ctx, s) => {
     glossyCircle(ctx, s / 2, s / 2, s * 0.44, '#FFF3D6');
   },
-  flower: (ctx, s) => petalFlower(ctx, s / 2, s / 2, s * 0.34, '#F7A8CF', '#F2AB27', lwOf(s) * 0.8),
+  flower: (ctx, s) => petalFlower(ctx, s / 2, s / 2, s * 0.34, '#F7A8CF', '#FFB020', lwOf(s) * 0.8),
 };

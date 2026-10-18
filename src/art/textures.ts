@@ -1,12 +1,13 @@
 // Gera todas as texturas do jogo por código. Se uma imagem com o mesmo nome já tiver sido
 // carregada a partir de um PNG (assets/manifest.json), a versão desenhada não é criada.
+// Estilo: gemas/vidro com brilho, janelas de vidro fosco, sem contornos pretos grossos.
 import Phaser from 'phaser';
 import { PALETTE } from '../core/palette';
+import { THEME } from '../ui/theme';
 import { BEE_COLORS, drawBee, type BeeChar } from './bee';
 import { BEE_CHARS, BEE_EXPRS } from './keys';
-import { ellipse, glossyCircle, glossyTile, INK, rr, shade, star, strokeFill, type Ctx } from './canvas';
+import { ellipse, glossyCircle, glossyTile, rgba, rr, shade, star, strokeFill, type Ctx } from './canvas';
 import { ICONS } from './icons';
-
 
 export function ensureTexture(scene: Phaser.Scene, key: string, w: number, h: number, draw: (ctx: Ctx) => void): string {
   if (scene.textures.exists(key)) return key;
@@ -23,22 +24,23 @@ export function buildTextures(scene: Phaser.Scene): void {
     ensureTexture(scene, `ic_${name}`, 128, 128, (ctx) => fn(ctx, 128));
   }
   for (const c of PALETTE) {
-    ensureTexture(scene, `block_${c.id}`, 64, 64, (ctx) => glossyTile(ctx, 2, 2, 60, 60, 12, c.hex));
-    ensureTexture(scene, `piece_${c.id}`, 128, 128, (ctx) => glossyTile(ctx, 4, 4, 120, 120, 26, c.hex));
+    // gemas com um pequeno espaço à volta (os blocos ficam separados, como contas de vidro)
+    ensureTexture(scene, `block_${c.id}`, 64, 64, (ctx) => glossyTile(ctx, 5, 4, 54, 54, 15, c.hex));
+    ensureTexture(scene, `piece_${c.id}`, 128, 128, (ctx) => glossyTile(ctx, 10, 8, 108, 108, 32, c.hex));
     ensureTexture(scene, `bud_${c.id}`, 64, 64, (ctx) => drawBud(ctx, c.hex));
   }
   ensureTexture(scene, 'ic_speed_badge', 128, 128, (ctx) => {
-    glossyCircle(ctx, 64, 64, 56, '#0293F2');
+    glossyCircle(ctx, 64, 64, 54, THEME.glowBlue);
     ctx.save();
     ctx.translate(26, 26);
     ICONS.speed(ctx, 76);
     ctx.restore();
   });
   ensureTexture(scene, 'stone', 64, 64, drawStone);
-  ensureTexture(scene, 'piece_hidden', 128, 128, (ctx) => glossyTile(ctx, 4, 4, 120, 120, 26, '#9AA3AD'));
+  ensureTexture(scene, 'piece_hidden', 128, 128, (ctx) => glossyTile(ctx, 10, 8, 108, 108, 32, '#6E6894'));
   ensureTexture(scene, 'slot', 120, 120, drawSlot);
   ensureTexture(scene, 'hive_door', 220, 120, drawHiveDoor);
-  ensureTexture(scene, 'cloud', 256, 128, drawCloud);
+  ensureTexture(scene, 'cloud', 256, 256, drawBokeh);
   ensureTexture(scene, 'leaf', 48, 48, (ctx) => ICONS.folha(ctx, 48));
   ensureTexture(scene, 'px_dot', 24, 24, (ctx) => {
     const g = ctx.createRadialGradient(12, 12, 1, 12, 12, 12);
@@ -59,9 +61,9 @@ export function buildTextures(scene: Phaser.Scene): void {
   });
   ensureTexture(scene, 'px_pollen', 20, 20, (ctx) => {
     const g = ctx.createRadialGradient(10, 10, 1, 10, 10, 10);
-    g.addColorStop(0, 'rgba(255,240,170,1)');
-    g.addColorStop(0.5, 'rgba(247,197,49,0.8)');
-    g.addColorStop(1, 'rgba(247,197,49,0)');
+    g.addColorStop(0, 'rgba(255,240,190,1)');
+    g.addColorStop(0.5, 'rgba(255,194,61,0.7)');
+    g.addColorStop(1, 'rgba(255,194,61,0)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, 20, 20);
   });
@@ -75,249 +77,249 @@ export function buildTextures(scene: Phaser.Scene): void {
 }
 
 function drawBud(ctx: Ctx, hex: string): void {
-  // flor fechada: botão com pétalas fechadas da cor do bloco, sobre fundo verde
-  glossyTile(ctx, 2, 2, 60, 60, 12, '#3E8F33');
+  // flor fechada: botão com pétalas fechadas da cor do bloco, sobre uma gema verde-escura
+  glossyTile(ctx, 5, 4, 54, 54, 15, '#2F6B4F');
   ctx.save();
-  ctx.translate(32, 34);
+  ctx.translate(32, 32);
   for (const [rot, sc] of [
-    [-0.45, 0.9],
-    [0.45, 0.9],
-    [0, 1],
+    [-0.45, 0.85],
+    [0.45, 0.85],
+    [0, 0.95],
   ] as const) {
     ctx.save();
     ctx.rotate(rot);
-    ellipse(ctx, 0, -4, 11 * sc, 19 * sc);
-    strokeFill(ctx, shade(hex, rot === 0 ? 0.15 : -0.1), 2.4);
+    ellipse(ctx, 0, -3, 10 * sc, 17 * sc);
+    strokeFill(ctx, shade(hex, rot === 0 ? 0.2 : -0.05), 1.5, 'rgba(255,255,255,0.35)');
     ctx.restore();
   }
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
-  ellipse(ctx, -3, -12, 3, 6);
+  ctx.fillStyle = 'rgba(255,255,255,0.65)';
+  ellipse(ctx, -3, -11, 2.5, 5);
   ctx.fill();
   ctx.restore();
 }
 
 function drawStone(ctx: Ctx): void {
-  glossyTile(ctx, 2, 2, 60, 60, 12, '#5B4A3A');
-  ctx.strokeStyle = 'rgba(0,0,0,0.35)';
-  ctx.lineWidth = 2;
+  glossyTile(ctx, 5, 4, 54, 54, 15, '#4A4560');
+  ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+  ctx.lineWidth = 1.6;
   ctx.beginPath();
-  ctx.moveTo(14, 16);
-  ctx.lineTo(24, 24);
-  ctx.lineTo(20, 34);
-  ctx.moveTo(44, 12);
-  ctx.lineTo(40, 22);
+  ctx.moveTo(16, 18);
+  ctx.lineTo(25, 25);
+  ctx.lineTo(21, 34);
+  ctx.moveTo(44, 14);
+  ctx.lineTo(40, 23);
   ctx.moveTo(46, 44);
-  ctx.lineTo(38, 40);
+  ctx.lineTo(39, 40);
   ctx.stroke();
 }
 
 function drawSlot(ctx: Ctx): void {
-  rr(ctx, 4, 6, 112, 110, 26);
-  ctx.fillStyle = 'rgba(0,0,0,0.12)';
+  // poço de vidro escuro com sombra interior
+  rr(ctx, 6, 6, 108, 108, 30);
+  ctx.fillStyle = 'rgba(8,4,24,0.45)';
   ctx.fill();
-  rr(ctx, 4, 2, 112, 110, 26);
-  const g = ctx.createLinearGradient(0, 2, 0, 112);
-  g.addColorStop(0, '#E9E2CF');
-  g.addColorStop(0.25, '#FFFFFF');
-  g.addColorStop(1, '#FFFFFF');
+  ctx.save();
+  rr(ctx, 6, 6, 108, 108, 30);
+  ctx.clip();
+  const g = ctx.createLinearGradient(0, 6, 0, 114);
+  g.addColorStop(0, 'rgba(0,0,0,0.35)');
+  g.addColorStop(0.35, 'rgba(255,255,255,0.03)');
+  g.addColorStop(1, 'rgba(255,255,255,0.08)');
   ctx.fillStyle = g;
-  ctx.fill();
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = 'rgba(46,36,18,0.25)';
+  ctx.fillRect(0, 0, 120, 120);
+  ctx.restore();
+  rr(ctx, 6.5, 6.5, 107, 107, 30);
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = 'rgba(255,255,255,0.16)';
   ctx.stroke();
 }
 
 function drawHiveDoor(ctx: Ctx): void {
-  // entrada da colmeia: arco de cera com buraco escuro
-  ellipse(ctx, 110, 70, 104, 46);
-  const g = ctx.createLinearGradient(0, 24, 0, 116);
-  g.addColorStop(0, '#FFD66B');
-  g.addColorStop(1, '#D1992C');
-  strokeFill(ctx, g, 5);
-  ellipse(ctx, 110, 74, 62, 30);
-  const h = ctx.createRadialGradient(110, 80, 5, 110, 74, 62);
-  h.addColorStop(0, '#120C04');
-  h.addColorStop(1, '#4A3416');
-  strokeFill(ctx, h, 4);
-  ctx.fillStyle = 'rgba(255,255,255,0.45)';
-  ellipse(ctx, 50, 50, 22, 8, -0.3);
+  // entrada da colmeia: portal hexagonal dourado com brilho
+  const glow = ctx.createRadialGradient(110, 64, 10, 110, 64, 105);
+  glow.addColorStop(0, rgba(THEME.accent, 0.45));
+  glow.addColorStop(1, rgba(THEME.accent, 0));
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, 220, 120);
+  const hexPath = (r: number, sy: number) => {
+    ctx.beginPath();
+    for (let k = 0; k < 6; k++) {
+      const a = (k * Math.PI) / 3;
+      ctx.lineTo(110 + Math.cos(a) * r, 62 + Math.sin(a) * r * sy);
+    }
+    ctx.closePath();
+  };
+  hexPath(78, 0.62);
+  const ring = ctx.createLinearGradient(0, 14, 0, 110);
+  ring.addColorStop(0, '#FFE08A');
+  ring.addColorStop(1, '#E8961E');
+  ctx.fillStyle = ring;
+  ctx.fill();
+  hexPath(58, 0.6);
+  const hole = ctx.createRadialGradient(110, 70, 4, 110, 62, 60);
+  hole.addColorStop(0, '#05030E');
+  hole.addColorStop(1, '#2A1A3E');
+  ctx.fillStyle = hole;
+  ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ellipse(ctx, 70, 34, 16, 4, -0.3);
   ctx.fill();
 }
 
-function drawCloud(ctx: Ctx): void {
-  ctx.fillStyle = 'rgba(255,255,255,0.95)';
-  for (const [x, y, r] of [
-    [70, 80, 40],
-    [120, 62, 52],
-    [175, 78, 40],
-    [205, 92, 26],
-    [42, 96, 24],
-  ] as const) {
-    ellipse(ctx, x, y, r, r * 0.86);
-    ctx.fill();
-  }
-  ctx.fillRect(40, 92, 170, 24);
+/** Luz desfocada (bokeh) para o ambiente. */
+function drawBokeh(ctx: Ctx): void {
+  const g = ctx.createRadialGradient(128, 128, 4, 128, 128, 128);
+  g.addColorStop(0, 'rgba(255,255,255,0.55)');
+  g.addColorStop(0.35, 'rgba(255,255,255,0.18)');
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 256, 256);
 }
 
-/** Botão com relevo (aresta inferior mais escura). */
+/** Botão em pílula com gradiente, brilho de vidro e sombra colorida suave. */
 export function buttonTexture(scene: Phaser.Scene, w: number, h: number, color: string): string {
   return ensureTexture(scene, `btn_${color}_${w}x${h}`, w, h + 10, (ctx) => {
-    const r = Math.min(h / 2, 30);
-    rr(ctx, 2, 10, w - 4, h - 4, r);
-    ctx.fillStyle = shade(color, -0.4);
+    const r = Math.min(h / 2, 34);
+    ctx.save();
+    ctx.shadowColor = rgba(color, 0.55);
+    ctx.shadowBlur = 14;
+    ctx.shadowOffsetY = 5;
+    rr(ctx, 6, 4, w - 12, h - 10, r);
+    ctx.fillStyle = shade(color, -0.15);
     ctx.fill();
-    rr(ctx, 2, 2, w - 4, h - 6, r);
-    const g = ctx.createLinearGradient(0, 2, 0, h - 4);
-    g.addColorStop(0, shade(color, 0.3));
-    g.addColorStop(0.5, color);
-    g.addColorStop(1, shade(color, -0.1));
+    ctx.restore();
+    rr(ctx, 6, 4, w - 12, h - 10, r);
+    const g = ctx.createLinearGradient(0, 4, 0, h - 6);
+    g.addColorStop(0, shade(color, 0.28));
+    g.addColorStop(1, shade(color, -0.12));
     ctx.fillStyle = g;
     ctx.fill();
     ctx.save();
-    rr(ctx, 2, 2, w - 4, h - 6, r);
+    rr(ctx, 6, 4, w - 12, h - 10, r);
     ctx.clip();
-    rr(ctx, 10, 6, w - 20, (h - 6) * 0.42, r * 0.8);
-    ctx.fillStyle = 'rgba(255,255,255,0.32)';
+    const gl = ctx.createLinearGradient(0, 4, 0, h * 0.5);
+    gl.addColorStop(0, 'rgba(255,255,255,0.38)');
+    gl.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = gl;
+    rr(ctx, 12, 7, w - 24, (h - 10) * 0.45, r * 0.8);
     ctx.fill();
     ctx.restore();
-    rr(ctx, 2, 2, w - 4, h + 4, r);
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = INK;
+    rr(ctx, 6.75, 4.75, w - 13.5, h - 11.5, r);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(255,255,255,0.35)';
     ctx.stroke();
   });
 }
 
-/** Painel creme das janelas. */
+/** Janela de vidro fosco escuro. */
 export function panelTexture(scene: Phaser.Scene, w: number, h: number): string {
   return ensureTexture(scene, `panel_${w}x${h}`, w, h, (ctx) => {
-    rr(ctx, 3, 12, w - 6, h - 15, 40);
-    ctx.fillStyle = '#C9B489';
+    const r = 44;
+    ctx.save();
+    ctx.shadowColor = THEME.shadow;
+    ctx.shadowBlur = 30;
+    ctx.shadowOffsetY = 10;
+    rr(ctx, 14, 10, w - 28, h - 30, r);
+    ctx.fillStyle = THEME.panelBottom;
     ctx.fill();
-    rr(ctx, 3, 3, w - 6, h - 15, 40);
-    const g = ctx.createLinearGradient(0, 0, 0, h);
-    g.addColorStop(0, '#FFFDF6');
-    g.addColorStop(1, '#F2EAD3');
+    ctx.restore();
+    rr(ctx, 14, 10, w - 28, h - 30, r);
+    const g = ctx.createLinearGradient(0, 10, 0, h - 20);
+    g.addColorStop(0, THEME.panelTop);
+    g.addColorStop(1, THEME.panelBottom);
     ctx.fillStyle = g;
     ctx.fill();
-    ctx.lineWidth = 6;
-    ctx.strokeStyle = INK;
-    rr(ctx, 3, 3, w - 6, h - 6, 40);
+    ctx.save();
+    rr(ctx, 14, 10, w - 28, h - 30, r);
+    ctx.clip();
+    const glow = ctx.createRadialGradient(w * 0.3, 0, 10, w * 0.3, 0, w * 0.9);
+    glow.addColorStop(0, rgba(THEME.accent, 0.16));
+    glow.addColorStop(1, rgba(THEME.accent, 0));
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
+    rr(ctx, 14.75, 10.75, w - 29.5, h - 31.5, r);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)';
     ctx.stroke();
   });
 }
 
-/** Cartão interior (linhas da loja, prémios). */
-export function cardTexture(scene: Phaser.Scene, w: number, h: number, color = '#FFFFFF'): string {
+/** Cartão interior (linhas da loja, prémios): vidro mais claro, com tinta opcional. */
+export function cardTexture(scene: Phaser.Scene, w: number, h: number, color: string = THEME.card): string {
   return ensureTexture(scene, `card_${color}_${w}x${h}`, w, h, (ctx) => {
-    rr(ctx, 2, 6, w - 4, h - 8, 22);
-    ctx.fillStyle = 'rgba(46,36,18,0.18)';
-    ctx.fill();
-    rr(ctx, 2, 2, w - 4, h - 8, 22);
+    const tint = color !== THEME.card;
+    rr(ctx, 2, 2, w - 4, h - 6, 24);
     const g = ctx.createLinearGradient(0, 0, 0, h);
-    g.addColorStop(0, shade(color, 0.3));
-    g.addColorStop(1, color);
+    g.addColorStop(0, tint ? rgba(color, 0.32) : THEME.cardHi);
+    g.addColorStop(1, tint ? rgba(color, 0.14) : THEME.card);
     ctx.fillStyle = g;
     ctx.fill();
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = 'rgba(46,36,18,0.45)';
+    rr(ctx, 2.75, 2.75, w - 5.5, h - 7.5, 24);
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = tint ? rgba(color, 0.55) : 'rgba(255,255,255,0.12)';
     ctx.stroke();
   });
 }
 
-/** Fita do título das janelas. */
-export function ribbonTexture(scene: Phaser.Scene, w: number, color = '#F2AB27'): string {
-  const h = 92;
-  return ensureTexture(scene, `ribbon_${color}_${w}`, w, h, (ctx) => {
-    for (const dir of [-1, 1]) {
-      ctx.beginPath();
-      const x0 = dir < 0 ? 4 : w - 4;
-      ctx.moveTo(x0, 24);
-      ctx.lineTo(x0 - dir * 60, 24);
-      ctx.lineTo(x0 - dir * 60, 82);
-      ctx.lineTo(x0, 82);
-      ctx.lineTo(x0 - dir * 22, 53);
-      ctx.closePath();
-      strokeFill(ctx, shade(color, -0.3), 5);
-    }
-    rr(ctx, 34, 6, w - 68, 70, 18);
-    const g = ctx.createLinearGradient(0, 6, 0, 76);
-    g.addColorStop(0, shade(color, 0.3));
-    g.addColorStop(1, shade(color, -0.05));
-    strokeFill(ctx, g, 5);
-  });
-}
-
-/** Moldura do quadro (madeira de mel) com o tamanho exato do nível. */
+/** Bandeja de vidro escuro onde fica o quadro de blocos. */
 export function frameTexture(scene: Phaser.Scene, w: number, h: number): string {
   return ensureTexture(scene, `frame_${w}x${h}`, w, h, (ctx) => {
-    rr(ctx, 2, 8, w - 4, h - 10, 34);
-    ctx.fillStyle = '#8A5A22';
+    ctx.save();
+    ctx.shadowColor = THEME.shadow;
+    ctx.shadowBlur = 26;
+    ctx.shadowOffsetY = 8;
+    rr(ctx, 10, 6, w - 20, h - 22, 34);
+    ctx.fillStyle = 'rgba(16,10,40,0.75)';
     ctx.fill();
-    rr(ctx, 2, 2, w - 4, h - 10, 34);
+    ctx.restore();
+    rr(ctx, 10, 6, w - 20, h - 22, 34);
     const g = ctx.createLinearGradient(0, 0, 0, h);
-    g.addColorStop(0, '#F7C960');
-    g.addColorStop(1, '#D1992C');
+    g.addColorStop(0, 'rgba(255,255,255,0.09)');
+    g.addColorStop(1, 'rgba(255,255,255,0.03)');
     ctx.fillStyle = g;
     ctx.fill();
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = INK;
-    rr(ctx, 2, 2, w - 4, h - 4, 34);
-    ctx.stroke();
-    rr(ctx, 18, 18, w - 36, h - 40, 18);
-    ctx.fillStyle = '#FBF6EA';
-    ctx.fill();
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = 'rgba(46,36,18,0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(255,255,255,0.16)';
     ctx.stroke();
   });
 }
 
-/** Fundo de jardim do ecrã inicial (céu, sol, colinas). */
-export function gardenTexture(scene: Phaser.Scene, w: number, h: number): string {
-  return ensureTexture(scene, `garden_${w}x${h}`, w, h, (ctx) => {
-    const sky = ctx.createLinearGradient(0, 0, 0, h);
-    sky.addColorStop(0, '#7CC8F7');
-    sky.addColorStop(0.55, '#CDEBFA');
-    sky.addColorStop(1, '#FBF6EA');
-    ctx.fillStyle = sky;
+/** Fundo da app: noite índigo/ameixa com brilhos cor de mel e favos muito subtis. */
+export function backgroundTexture(scene: Phaser.Scene, w: number, h: number): string {
+  return ensureTexture(scene, `bg_${w}x${h}`, w, h, (ctx) => {
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, THEME.bgTop);
+    g.addColorStop(0.55, THEME.bgMid);
+    g.addColorStop(1, THEME.bgBottom);
+    ctx.fillStyle = g;
     ctx.fillRect(0, 0, w, h);
-    const sun = ctx.createRadialGradient(w * 0.85, h * 0.12, 10, w * 0.85, h * 0.12, w * 0.4);
-    sun.addColorStop(0, 'rgba(255,240,170,0.9)');
-    sun.addColorStop(1, 'rgba(255,240,170,0)');
-    ctx.fillStyle = sun;
-    ctx.fillRect(0, 0, w, h);
-    const hill = (y: number, amp: number, col: string, ph: number) => {
-      ctx.beginPath();
-      ctx.moveTo(0, h);
-      for (let x = 0; x <= w; x += 10) ctx.lineTo(x, y + Math.sin(x / w * Math.PI * 2 + ph) * amp);
-      ctx.lineTo(w, h);
-      ctx.closePath();
-      const g = ctx.createLinearGradient(0, y - amp, 0, h);
-      g.addColorStop(0, shade(col, 0.15));
-      g.addColorStop(1, shade(col, -0.15));
-      ctx.fillStyle = g;
-      ctx.fill();
+    const glow = (x: number, y: number, r: number, c: string, a: number) => {
+      const rg = ctx.createRadialGradient(x, y, 0, x, y, r);
+      rg.addColorStop(0, rgba(c, a));
+      rg.addColorStop(1, rgba(c, 0));
+      ctx.fillStyle = rg;
+      ctx.fillRect(0, 0, w, h);
     };
-    hill(h * 0.62, 30, '#8ED46F', 0.5);
-    hill(h * 0.7, 26, '#6CC24F', 2.2);
-    hill(h * 0.8, 18, '#54C143', 4);
-    // flores no relvado
-    const cols = ['#F2059F', '#F7A8CF', '#F2AB27', '#FFFFFF', '#8302D2', '#0293F2'];
-    for (let i = 0; i < 70; i++) {
-      const x = (Math.sin(i * 12.9898) * 43758.5453) % 1;
-      const y = (Math.sin(i * 78.233) * 12543.1234) % 1;
-      const px = Math.abs(x) * w;
-      const py = h * 0.66 + Math.abs(y) * h * 0.34;
-      const r = 4 + (i % 4);
-      ctx.fillStyle = cols[i % cols.length];
-      for (let k = 0; k < 5; k++) {
-        const a = (k / 5) * Math.PI * 2;
-        ellipse(ctx, px + Math.cos(a) * r, py + Math.sin(a) * r, r * 0.7, r * 0.7);
-        ctx.fill();
+    glow(w * 0.5, h * 0.42, w * 0.75, THEME.glowHoney, 0.2);
+    glow(w * 0.05, h * 0.12, w * 0.6, THEME.glowBlue, 0.22);
+    glow(w * 0.95, h * 0.85, w * 0.7, THEME.glowPink, 0.18);
+    // favos muito subtis
+    ctx.strokeStyle = 'rgba(255,255,255,0.035)';
+    ctx.lineWidth = 2;
+    const s = 46;
+    for (let row = -1; row < h / (s * 1.5) + 1; row++) {
+      for (let col = -1; col < w / (s * 1.73) + 1; col++) {
+        const cx = col * s * 1.73 + (row % 2 ? s * 0.866 : 0);
+        const cy = row * s * 1.5;
+        ctx.beginPath();
+        for (let k = 0; k < 6; k++) {
+          const a = Math.PI / 6 + (k * Math.PI) / 3;
+          ctx.lineTo(cx + Math.cos(a) * s, cy + Math.sin(a) * s);
+        }
+        ctx.closePath();
+        ctx.stroke();
       }
-      ctx.fillStyle = '#F7C531';
-      ellipse(ctx, px, py, r * 0.55, r * 0.55);
-      ctx.fill();
     }
   });
 }
@@ -325,10 +327,10 @@ export function gardenTexture(scene: Phaser.Scene, w: number, h: number): string
 /** Avatar redondo com a cara da Mel. */
 export function avatarTexture(scene: Phaser.Scene): string {
   return ensureTexture(scene, 'avatar_mel', 128, 128, (ctx) => {
-    glossyCircle(ctx, 64, 64, 58, '#FFF3D6');
+    glossyCircle(ctx, 64, 64, 56, '#3A2F72');
     ctx.save();
     ctx.beginPath();
-    ctx.arc(64, 64, 54, 0, Math.PI * 2);
+    ctx.arc(64, 64, 53, 0, Math.PI * 2);
     ctx.clip();
     drawBee(ctx, 64, 84, 112, 'mel', 'happy');
     ctx.restore();

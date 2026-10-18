@@ -9,9 +9,9 @@ import { dur, INK, L, txt } from './core';
 
 function pill(scene: Phaser.Scene, w: number, h: number): Phaser.GameObjects.Graphics {
   const g = scene.add.graphics();
-  g.fillStyle(0x2e2412, 0.35).fillRoundedRect(-w / 2, -h / 2 + 5, w, h, h / 2);
-  g.fillStyle(0xfffdf6, 1).fillRoundedRect(-w / 2, -h / 2, w, h, h / 2);
-  g.lineStyle(4, 0x2e2412, 1).strokeRoundedRect(-w / 2, -h / 2, w, h, h / 2);
+  // pílula de vidro escuro
+  g.fillStyle(0x07041a, 0.55).fillRoundedRect(-w / 2, -h / 2, w, h, h / 2);
+  g.lineStyle(2, 0xffffff, 0.14).strokeRoundedRect(-w / 2, -h / 2, w, h, h / 2);
   return g;
 }
 
@@ -73,7 +73,7 @@ export class LivesCounter extends Phaser.GameObjects.Container {
     this.num = txt(scene, -86, -2, '5', 30);
     this.inf = scene.add.image(-86, 0, 'ic_infinite').setDisplaySize(48, 48).setVisible(false);
     this.add([this.num, this.inf]);
-    this.info = txt(scene, 18, -1, '', 28, { body: true, weight: '800' });
+    this.info = txt(scene, 18, -1, '', 28, { body: true, weight: '600' });
     this.add(this.info);
     if (onTap) {
       heart.setInteractive({ useHandCursor: true }).on('pointerdown', onTap);
@@ -97,8 +97,9 @@ export class LivesCounter extends Phaser.GameObjects.Container {
 export function badge(scene: Phaser.Scene, x: number, y: number, label = '!'): Phaser.GameObjects.Container {
   const c = scene.add.container(x, y);
   const g = scene.add.graphics();
-  g.fillStyle(0x2e2412, 1).fillCircle(0, 2, 19);
-  g.fillStyle(0xe8384f, 1).fillCircle(0, 0, 17);
+  g.fillStyle(0xff4d6d, 0.35).fillCircle(0, 0, 21);
+  g.fillStyle(0xff4d6d, 1).fillCircle(0, 0, 17);
+  g.lineStyle(2, 0xffffff, 0.5).strokeCircle(0, 0, 17);
   c.add(g);
   c.add(txt(scene, 0, -2, label, 24, { stroke: false }));
   scene.tweens.add({ targets: c, scale: 1.15, duration: 500, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
@@ -112,7 +113,8 @@ export function toast(scene: Phaser.Scene, msg: string, y = L.H * 0.42): void {
   const w = Math.min(660, label.width + 60);
   const h = label.height + 30;
   const g = scene.add.graphics();
-  g.fillStyle(0x2e2412, 0.85).fillRoundedRect(-w / 2, -h / 2, w, h, 24);
+  g.fillStyle(0x1d1740, 0.94).fillRoundedRect(-w / 2, -h / 2, w, h, 24);
+  g.lineStyle(2, 0xffffff, 0.16).strokeRoundedRect(-w / 2, -h / 2, w, h, 24);
   c.add([g, label]);
   c.setScale(0.6).setAlpha(0);
   scene.tweens.add({ targets: c, scale: 1, alpha: 1, duration: dur(180), ease: 'Back.easeOut' });
@@ -128,12 +130,12 @@ export class ProgressBar extends Phaser.GameObjects.Container {
     y: number,
     private bw: number,
     private bh: number,
-    private color = 0x54c143,
+    private color = 0x22c98a,
   ) {
     super(scene, x, y);
     const g = scene.add.graphics();
-    g.fillStyle(0x2e2412, 1).fillRoundedRect(-bw / 2 - 3, -bh / 2 - 3, bw + 6, bh + 6, (bh + 6) / 2);
-    g.fillStyle(0xe9e0c6, 1).fillRoundedRect(-bw / 2, -bh / 2, bw, bh, bh / 2);
+    g.fillStyle(0x07041a, 0.6).fillRoundedRect(-bw / 2, -bh / 2, bw, bh, bh / 2);
+    g.lineStyle(2, 0xffffff, 0.12).strokeRoundedRect(-bw / 2, -bh / 2, bw, bh, bh / 2);
     this.fill = scene.add.graphics();
     this.add([g, this.fill]);
     scene.add.existing(this);
@@ -194,11 +196,11 @@ export function toggleRow(
 ): Phaser.GameObjects.Container {
   const c = scene.add.container(0, y);
   const ib = scene.add.graphics();
-  ib.fillStyle(0x0293f2, 1).fillCircle(-w / 2 + 34, 0, 30);
-  ib.lineStyle(4, 0x2e2412).strokeCircle(-w / 2 + 34, 0, 30);
+  ib.fillStyle(0x4f7bff, 0.25).fillCircle(-w / 2 + 34, 0, 30);
+  ib.lineStyle(2, 0x4f7bff, 0.8).strokeCircle(-w / 2 + 34, 0, 30);
   c.add(ib);
   c.add(scene.add.image(-w / 2 + 34, 0, icon).setDisplaySize(40, 40));
-  c.add(txt(scene, -w / 2 + 80, 0, label, 30, { body: true, origin: [0, 0.5], weight: '800' }));
+  c.add(txt(scene, -w / 2 + 80, 0, label, 30, { body: true, origin: [0, 0.5], weight: '600' }));
   const btn = new Button(scene, w / 2 - 80, 0, {
     w: 150,
     h: 64,
@@ -319,6 +321,6 @@ export class ScrollArea extends Phaser.GameObjects.Container {
 export function lockedLabel(scene: Phaser.Scene, x: number, y: number, label: string): Phaser.GameObjects.Container {
   const c = scene.add.container(x, y);
   c.add(scene.add.image(-60, 0, 'ic_lock').setDisplaySize(44, 44));
-  c.add(txt(scene, 10, 0, label, 24, { color: INK, stroke: false, body: true, weight: '800' }));
+  c.add(txt(scene, 10, 0, label, 24, { color: INK, stroke: false, body: true, weight: '600' }));
   return c;
 }
