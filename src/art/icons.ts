@@ -139,6 +139,29 @@ export const ICONS: Record<string, IconFn> = {
     ctx.fillStyle = INK;
     ctx.fill();
   },
+  key: (ctx, s) => {
+    // chave dourada na diagonal: argola + haste + dentes
+    ctx.save();
+    ctx.translate(s / 2, s / 2);
+    ctx.rotate(-Math.PI / 4);
+    ctx.translate(-s / 2, -s / 2);
+    const gold = lg(ctx, s * 0.2, s * 0.8, '#FFC23D');
+    ctx.beginPath();
+    ctx.arc(s * 0.3, s * 0.5, s * 0.19, 0, Math.PI * 2);
+    ctx.moveTo(s * 0.3 + s * 0.08, s * 0.5);
+    ctx.arc(s * 0.3, s * 0.5, s * 0.08, 0, Math.PI * 2, true);
+    strokeFill(ctx, gold, lwOf(s));
+    rr(ctx, s * 0.46, s * 0.45, s * 0.42, s * 0.1, s * 0.03);
+    strokeFill(ctx, gold, lwOf(s));
+    rr(ctx, s * 0.7, s * 0.53, s * 0.07, s * 0.14, s * 0.02);
+    strokeFill(ctx, gold, lwOf(s));
+    rr(ctx, s * 0.81, s * 0.53, s * 0.07, s * 0.1, s * 0.02);
+    strokeFill(ctx, gold, lwOf(s));
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ellipse(ctx, s * 0.24, s * 0.38, s * 0.05, s * 0.025, -0.6);
+    ctx.fill();
+    ctx.restore();
+  },
   check: (ctx, s) => {
     ctx.beginPath();
     ctx.moveTo(s * 0.2, s * 0.52);

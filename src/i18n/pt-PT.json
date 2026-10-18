@@ -53,7 +53,9 @@
     "pickPiece": "Toca numa peça para a tirar",
     "noReach": "Nenhuma cor tem blocos alcançáveis",
     "speedOn": "2x ligado",
-    "speedOff": "2x pausado"
+    "speedOff": "2x pausado",
+    "locked": "Cadeado! Recolhe mais {n} blocos da cor da chave",
+    "keyWon": "Chave ganha! Cadeado aberto"
   },
   "boosters": {
     "slot": "+1 Ranhura",
@@ -276,6 +278,10 @@
     "hiddenText": "Mostram \"?\" até chegarem à fila da frente.",
     "flowers": "Flores fechadas",
     "flowersText": "Só abrem quando a cor indicada for toda recolhida do quadro.",
+    "boxes": "Caixas",
+    "boxesText": "Tapam os blocos por baixo. Cada bloco recolhido mesmo ao lado de uma caixa desce 1 no número. A 0, a caixa parte-se.",
+    "locks": "Cores com cadeado",
+    "locksText": "As peças com cadeado não se podem tocar. Recolhe os blocos da cor da chave (lá em cima) para ganhar a chave e abrir o cadeado.",
     "gotIt": "Percebi!"
   },
   "ads": {

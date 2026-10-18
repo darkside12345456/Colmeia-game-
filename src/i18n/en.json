@@ -53,7 +53,9 @@
     "pickPiece": "Tap a piece to take it",
     "noReach": "No colour has reachable blocks",
     "speedOn": "2x on",
-    "speedOff": "2x paused"
+    "speedOff": "2x paused",
+    "locked": "Locked! Collect {n} more blocks of the key colour",
+    "keyWon": "Key won! Lock opened"
   },
   "boosters": {
     "slot": "+1 Slot",
@@ -276,6 +278,10 @@
     "hiddenText": "They show \"?\" until they reach the front row.",
     "flowers": "Closed flowers",
     "flowersText": "They only open when the shown colour has been fully collected from the board.",
+    "boxes": "Crates",
+    "boxesText": "They cover the blocks underneath. Each block collected right next to a crate lowers its number by 1. At 0, the crate breaks.",
+    "locks": "Locked colours",
+    "locksText": "Locked pieces cannot be tapped. Collect blocks of the key colour (at the top) to win the key and open the lock.",
     "gotIt": "Got it!"
   },
   "ads": {

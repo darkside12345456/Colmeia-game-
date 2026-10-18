@@ -166,6 +166,73 @@ function drawHiveDoor(ctx: Ctx): void {
   ctx.fill();
 }
 
+/** Caixa de madeira cor de mel (tapa blocos do quadro). cw x ch em células, 64 px por célula. */
+export function boxTexture(scene: Phaser.Scene, cw: number, ch: number): string {
+  const w = cw * 64;
+  const h = ch * 64;
+  return ensureTexture(scene, `box_${cw}x${ch}`, w, h, (ctx) => {
+    const r = RADIUS.block + 2;
+    ctx.save();
+    ctx.shadowColor = 'rgba(8,4,24,0.55)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetY = 4;
+    rr(ctx, 3, 3, w - 6, h - 6, r);
+    ctx.fillStyle = '#7A4A1E';
+    ctx.fill();
+    ctx.restore();
+    const g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, '#E6A04A');
+    g.addColorStop(0.5, '#C97E2E');
+    g.addColorStop(1, '#9A5A20');
+    rr(ctx, 3, 3, w - 6, h - 6, r);
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.save();
+    rr(ctx, 3, 3, w - 6, h - 6, r);
+    ctx.clip();
+    // tábuas horizontais
+    ctx.strokeStyle = 'rgba(70,35,10,0.45)';
+    ctx.lineWidth = 2;
+    const planks = Math.max(2, ch * 2);
+    for (let k = 1; k < planks; k++) {
+      ctx.beginPath();
+      ctx.moveTo(0, (h * k) / planks);
+      ctx.lineTo(w, (h * k) / planks);
+      ctx.stroke();
+    }
+    // travessa em diagonal
+    ctx.strokeStyle = 'rgba(70,35,10,0.5)';
+    ctx.lineWidth = Math.min(w, h) * 0.16;
+    ctx.beginPath();
+    ctx.moveTo(10, h - 10);
+    ctx.lineTo(w - 10, 10);
+    ctx.stroke();
+    ctx.strokeStyle = '#D99140';
+    ctx.lineWidth = Math.min(w, h) * 0.11;
+    ctx.stroke();
+    // brilho em cima
+    const gl = ctx.createLinearGradient(0, 0, 0, h * 0.4);
+    gl.addColorStop(0, 'rgba(255,255,255,0.35)');
+    gl.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = gl;
+    ctx.fillRect(0, 0, w, h * 0.4);
+    ctx.restore();
+    // moldura e parafusos
+    rr(ctx, 6, 6, w - 12, h - 12, r - 2);
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = 'rgba(70,35,10,0.55)';
+    ctx.stroke();
+    for (const [x, y] of [
+      [13, 13],
+      [w - 13, 13],
+      [13, h - 13],
+      [w - 13, h - 13],
+    ]) {
+      glossyCircle(ctx, x, y, 4.5, '#E8E2F5');
+    }
+  });
+}
+
 /** Luz desfocada (bokeh) para o ambiente. */
 function drawBokeh(ctx: Ctx): void {
   const g = ctx.createRadialGradient(128, 128, 4, 128, 128, 128);

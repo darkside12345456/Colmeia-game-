@@ -25,7 +25,7 @@ for (const lang of ['pt-PT', 'en']) {
         s.boostersIntroduced[k] = true;
         s.boosters[k] = 3;
       }
-      for (const k of ['twins', 'tubes', 'stones', 'hidden', 'flowers']) s.seen['obs_' + k] = true;
+      for (const k of ['twins', 'tubes', 'stones', 'hidden', 'flowers', 'boxes', 'locks']) s.seen['obs_' + k] = true;
       s.seen.tut_tap = true;
       s.seen.tut_tray = true;
       s.purchases.starterPackSeen = true;

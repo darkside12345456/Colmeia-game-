@@ -3,7 +3,7 @@
 import Phaser from 'phaser';
 import { app } from '../app';
 import { BEE_COLORS } from '../art/bee';
-import { backgroundTexture, frameTexture } from '../art/textures';
+import { backgroundTexture, boxTexture, frameTexture } from '../art/textures';
 import { GameEngine, KIND_FLOWER, KIND_STONE, MAX_SLOTS, type Bee, type EngineEvent, type RPiece } from '../core/engine';
 import { colorHex } from '../core/palette';
 import { smartShuffle } from '../core/solver';
@@ -37,6 +37,7 @@ interface PieceView {
   c: Phaser.GameObjects.Container;
   img: Phaser.GameObjects.Image;
   num: Phaser.GameObjects.Text;
+  lock: Phaser.GameObjects.Image;
   id: number;
   hiddenShown: boolean;
 }
@@ -55,6 +56,8 @@ const OBSTACLE_TUTORIALS: [string, (l: LevelData) => boolean][] = [
   ['stones', (l) => !!l.stones?.length],
   ['hidden', (l) => l.columns.flat().some((p) => p.hidden)],
   ['flowers', (l) => !!l.flowers?.length],
+  ['boxes', (l) => !!l.boxes?.length],
+  ['locks', (l) => !!l.locks?.length],
 ];
 
 export class GameScene extends BaseScene {
@@ -75,6 +78,8 @@ export class GameScene extends BaseScene {
   private blocks: (Phaser.GameObjects.Image | null)[] = [];
   private stoneLabels = new Map<number, Phaser.GameObjects.Text>();
   private flowerDots = new Map<number, Phaser.GameObjects.Image>();
+  private boxViews: { img: Phaser.GameObjects.Image; label: Phaser.GameObjects.Text }[] = [];
+  private keyChips: { c: Phaser.GameObjects.Container; label: Phaser.GameObjects.Text; lock: number }[] = [];
   private slotBgs: Phaser.GameObjects.Image[] = [];
   private views = new Map<number, PieceView>();
   private bees = new Map<number, BeeView>();
@@ -106,6 +111,8 @@ export class GameScene extends BaseScene {
     this.mode = null;
     this.blocks = [];
     this.stoneLabels = new Map();
+    this.boxViews = [];
+    this.keyChips = [];
     this.flowerDots = new Map();
     this.slotBgs = [];
     this.views = new Map();
@@ -201,6 +208,20 @@ export class GameScene extends BaseScene {
     if (diff !== 'normal') {
       txt(this, L.W / 2, 94, t(`difficulty.${diff}`), 26, { color: diff === 'hard' ? '#FFB020' : '#FF4D6D' }).setDepth(50);
     }
+    // chave(s): blocos da cor da chave já recolhidos / precisos
+    (this.level.locks ?? []).forEach((l, k) => {
+      const c = this.add.container(186, 62 + k * 62).setDepth(50);
+      const g = this.add.graphics();
+      g.fillStyle(0x07041a, 0.55).fillRoundedRect(-64, -27, 128, 54, RADIUS.chip);
+      g.lineStyle(2, hex(THEME.accent), 0.6).strokeRoundedRect(-64, -27, 128, 54, RADIUS.chip);
+      c.add(g);
+      c.add(this.add.image(-42, 0, 'ic_key').setDisplaySize(46, 46));
+      c.add(this.add.image(-10, 0, `block_${this.level.colors[l.key]}`).setDisplaySize(30, 30));
+      const label = txt(this, 32, -1, '', 24);
+      c.add(label);
+      this.keyChips.push({ c, label, lock: k });
+    });
+    this.refreshKeys();
     this.speedGlow = this.add.image(L.W - 66, 62, 'px_dot').setDisplaySize(160, 160).setTint(0x8fd3ff).setAlpha(0).setDepth(49);
     this.speedBtn = new Button(this, L.W - 66, 60, {
       round: true,
@@ -213,6 +234,14 @@ export class GameScene extends BaseScene {
     this.speedBtn.setDepth(50);
     this.speedLabel = txt(this, L.W - 66, 118, '', 24).setDepth(50);
     this.refreshSpeed();
+  }
+
+  private refreshKeys(): void {
+    for (const k of this.keyChips) {
+      const l = this.engine.locks[k.lock];
+      k.label.setText(`${this.engine.keyProgress(k.lock)}/${l.n}`);
+      if (k.label.width > 60) k.label.setScale(60 / k.label.width);
+    }
   }
 
   private onSpeedButton(): void {
@@ -262,7 +291,8 @@ export class GameScene extends BaseScene {
       img.setScale(0.01);
       this.tweens.add({ targets: img, scaleX: blockSize / 64, scaleY: blockSize / 64, delay: dur(d), duration: dur(260), ease: 'Back.easeOut' });
       if (k === KIND_STONE) {
-        const lab = txt(this, x, y, String(e.stoneLeft(i)), Math.max(14, this.cell * 0.55)).setDepth(11);
+        const lab = txt(this, x, y, String(e.stoneLeft(i)), Math.max(16, this.cell * 0.62)).setDepth(11);
+        if (lab.width > this.cell * 1.15) lab.setScale((this.cell * 1.15) / lab.width);
         this.stoneLabels.set(i, lab);
       }
       if (k === KIND_FLOWER) {
@@ -275,6 +305,17 @@ export class GameScene extends BaseScene {
         this.flowerDots.set(i, dot);
       }
     }
+    // caixas por cima dos blocos
+    (this.level.boxes ?? []).forEach((b, k) => {
+      const x = this.bx + (b.x + b.w / 2) * this.cell;
+      const y = this.by + (b.y + b.h / 2) * this.cell;
+      const img = this.add.image(x, y, boxTexture(this, b.w, b.h)).setDisplaySize(b.w * this.cell, b.h * this.cell).setDepth(12);
+      const label = txt(this, x, y, String(e.boxLeft[k]), Math.max(20, this.cell * Math.min(b.w, b.h) * 0.55)).setDepth(13);
+      img.setAlpha(0);
+      label.setAlpha(0);
+      this.tweens.add({ targets: [img, label], alpha: 1, delay: dur(350), duration: dur(300) });
+      this.boxViews.push({ img, label });
+    });
   }
 
   // ------------------------------------------------------------------ bandeja e colunas
@@ -325,8 +366,9 @@ export class GameScene extends BaseScene {
     const c = this.add.container(0, 0).setDepth(30);
     const img = this.add.image(0, 0, `piece_${this.level.colors[p.color]}`);
     const num = txt(this, 0, -4, String(p.remaining), 54);
-    c.add([img, num]);
-    const v: PieceView = { c, img, num, id, hiddenShown: false };
+    const lock = this.add.image(36, -36, 'ic_lock').setDisplaySize(62, 62).setVisible(false);
+    c.add([img, num, lock]);
+    const v: PieceView = { c, img, num, lock, id, hiddenShown: false };
     img.setInteractive({ useHandCursor: true });
     img.on('pointerdown', () => this.onPieceDown(v));
     this.views.set(id, v);
@@ -359,7 +401,9 @@ export class GameScene extends BaseScene {
         this.setHidden(v, p.hidden && !front);
         v.c.setDepth(30 - depth);
         const alpha = front ? 1 : 0.55;
-        v.img.setTint(front ? 0xffffff : 0xb4acd6);
+        const locked = this.engine.isLocked(p) && !v.hiddenShown;
+        v.lock.setVisible(locked);
+        v.img.setTint(locked ? 0x8f88b0 : front ? 0xffffff : 0xb4acd6);
         if (!animate || isNew) {
           v.c.setPosition(x, isNew && animate ? y + 60 : y).setScale(scale).setAlpha(isNew && animate ? 0 : alpha);
           if (isNew && animate) this.tweens.add({ targets: v.c, y, alpha, duration: dur(260), ease: 'Quad.easeOut' });
@@ -416,7 +460,7 @@ export class GameScene extends BaseScene {
     this.tweens.add({ targets: v.c, scaleY: v.c.scaleY * 0.86, scaleX: v.c.scaleX * 1.08, duration: 50, yoyo: true });
     if (this.mode === 'tweezers') {
       if (!e.canTweezers(id)) {
-        this.feedbackError(v, t('game.noSpace'));
+        this.feedbackError(v, this.lockMessage(id) ?? t('game.noSpace'));
         return;
       }
       useBooster(app.save, 'tweezers');
@@ -436,7 +480,9 @@ export class GameScene extends BaseScene {
     if (check !== 'ok') {
       const p = e.pieces.get(id)!;
       const msg =
-        check === 'tube' ? t('game.tube') : check === 'twinNotFront' ? t('game.twinNotFront') : p.twin >= 0 ? t('game.noSpaceTwin') : t('game.noSpace');
+        check === 'locked'
+          ? (this.lockMessage(id) ?? '')
+          : check === 'tube' ? t('game.tube') : check === 'twinNotFront' ? t('game.twinNotFront') : p.twin >= 0 ? t('game.noSpaceTwin') : t('game.noSpace');
       this.feedbackError(v, msg);
       return;
     }
@@ -446,6 +492,18 @@ export class GameScene extends BaseScene {
     this.handleEvents(e.flush());
     this.renderColumns(true);
     if (this.tutorialStep === 'tap') this.finishTapTutorial();
+  }
+
+  /** Mensagem "faltam N blocos da chave" se a peça (ou a gémea) tiver cadeado. */
+  private lockMessage(id: number): string | null {
+    const e = this.engine;
+    const p = e.pieces.get(id)!;
+    const q = p.twin >= 0 && e.isLocked(e.pieces.get(p.twin)!) ? e.pieces.get(p.twin)! : p;
+    if (!e.isLocked(q)) return null;
+    const k = e.lockOfColor[q.color];
+    const chip = this.keyChips.find((c) => c.lock === k);
+    if (chip) this.tweens.add({ targets: chip.c, scale: 1.15, duration: 90, yoyo: true, repeat: 1 });
+    return t('game.locked', { n: e.locks[k].n - e.keyProgress(k) });
   }
 
   private feedbackError(v: PieceView, msg: string): void {
@@ -480,6 +538,15 @@ export class GameScene extends BaseScene {
           break;
         case 'flowerOpen':
           this.onFlowerOpen(ev.cell);
+          break;
+        case 'boxHit':
+          this.onBoxHit(ev.box, ev.left);
+          break;
+        case 'boxOpen':
+          this.onBoxOpen(ev.box);
+          break;
+        case 'lockOpen':
+          this.onLockOpen(ev.lock);
           break;
         case 'magnet':
           this.onMagnet(ev.color, ev.cells);
@@ -517,6 +584,7 @@ export class GameScene extends BaseScene {
       v.c.setPosition(this.colX[Math.max(0, col)] ?? L.W / 2, this.rowY[2]);
     }
     this.setHidden(v, false);
+    v.lock.setVisible(false);
     v.img.setTint(0xffffff);
     v.c.setAlpha(1).setDepth(35);
     const p = this.engine.pieces.get(id)!;
@@ -589,8 +657,9 @@ export class GameScene extends BaseScene {
       if (bv) bv.carry = block;
       else block.destroy();
     }
-    // atualiza contadores das pedras
+    // atualiza contadores das pedras e da chave
     for (const [cell, lab] of this.stoneLabels) lab.setText(String(this.engine.stoneLeft(cell)));
+    if (this.keyChips.length) this.refreshKeys();
   }
 
   private onDeliver(bee: Bee, pieceId: number, remaining: number): void {
@@ -681,6 +750,51 @@ export class GameScene extends BaseScene {
     }
   }
 
+  private onBoxHit(box: number, left: number): void {
+    const bv = this.boxViews[box];
+    if (!bv) return;
+    bv.label.setText(String(left));
+    this.tweens.killTweensOf(bv.label);
+    bv.label.setScale(1.35);
+    this.tweens.add({ targets: bv.label, scale: 1, duration: dur(160), ease: 'Quad.easeOut' });
+    const x = bv.img.x;
+    this.tweens.add({ targets: bv.img, x: x + 3, duration: 40, yoyo: true, onComplete: () => bv.img.setX(x) });
+  }
+
+  private onBoxOpen(box: number): void {
+    const bv = this.boxViews[box];
+    if (!bv) return;
+    bv.label.destroy();
+    burst(this, bv.img.x, bv.img.y, 0xc97e2e, 22, 40);
+    app.audio.play('pop');
+    app.haptics.light();
+    this.tweens.add({ targets: bv.img, scale: bv.img.scale * 1.2, alpha: 0, angle: 8, duration: dur(260), ease: 'Quad.easeOut', onComplete: () => bv.img.destroy() });
+  }
+
+  private onLockOpen(lock: number): void {
+    const color = this.engine.locks[lock].c;
+    for (const v of this.views.values()) {
+      if (!v.lock.visible || this.engine.pieces.get(v.id)?.color !== color) continue;
+      this.tweens.add({
+        targets: v.lock,
+        y: v.lock.y - 40,
+        alpha: 0,
+        duration: dur(380),
+        ease: 'Quad.easeOut',
+        onComplete: () => v.lock.setVisible(false).setAlpha(1).setY(-36),
+      });
+    }
+    const chip = this.keyChips.find((c) => c.lock === lock);
+    if (chip) {
+      burst(this, chip.c.x, chip.c.y, 0xffc23d, 18, 30);
+      this.tweens.add({ targets: chip.c, scale: 1.25, duration: dur(160), yoyo: true });
+    }
+    this.refreshKeys();
+    this.time.delayedCall(dur(400), () => this.renderColumns(true));
+    app.audio.play('chest');
+    toast(this, t('game.keyWon'), this.trayY - 40);
+  }
+
   private onMagnet(color: number, cells: number[]): void {
     const hex = Phaser.Display.Color.HexStringToColor(colorHex(this.level.colors[color])).color;
     cells.forEach((cell, k) => {
@@ -713,6 +827,7 @@ export class GameScene extends BaseScene {
     burst(this, this.door.x, this.door.y, hex, 24, 70);
     app.audio.play('chest');
     for (const [cell, lab] of this.stoneLabels) lab.setText(String(this.engine.stoneLeft(cell)));
+    if (this.keyChips.length) this.refreshKeys();
   }
 
   // ------------------------------------------------------------------ ciclo

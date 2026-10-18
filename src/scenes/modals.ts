@@ -2,6 +2,7 @@
 // reforços, tutoriais de obstáculos, regras e prémios.
 import Phaser from 'phaser';
 import { app } from '../app';
+import { boxTexture } from '../art/textures';
 import { formatDuration, t } from '../i18n';
 import { config, type BoosterId } from '../meta/config';
 import {
@@ -473,6 +474,17 @@ export function obstacleModal(scene: Phaser.Scene, key: string): Promise<void> {
     } else if (key === 'stones') {
       ill.add(scene.add.image(0, 0, 'stone').setDisplaySize(140, 140));
       ill.add(txt(scene, 0, 0, '25', 56));
+    } else if (key === 'boxes') {
+      ill.add(scene.add.image(0, 0, 'block_sol').setDisplaySize(70, 70).setPosition(-110, 0));
+      ill.add(scene.add.image(110, 0, 'block_sol').setDisplaySize(70, 70));
+      ill.add(scene.add.image(0, 0, boxTexture(scene, 2, 2)).setDisplaySize(140, 140));
+      ill.add(txt(scene, 0, -2, '2', 64));
+    } else if (key === 'locks') {
+      ill.add(scene.add.image(-110, 0, 'ic_key').setDisplaySize(110, 110));
+      ill.add(scene.add.image(-40, 30, 'block_azul').setDisplaySize(50, 50));
+      ill.add(scene.add.image(80, 0, 'piece_rosa').setDisplaySize(130, 130).setTint(0x8f88b0));
+      ill.add(txt(scene, 80, -4, '14', 50));
+      ill.add(scene.add.image(122, -42, 'ic_lock').setDisplaySize(70, 70));
     } else if (key === 'hidden') {
       ill.add(scene.add.image(0, 0, 'piece_hidden').setDisplaySize(130, 130));
       ill.add(txt(scene, 0, -4, '?', 64));

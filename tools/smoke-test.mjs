@@ -199,7 +199,7 @@ try {
         s.boostersIntroduced[k] = true;
         s.boosters[k] = 2;
       }
-      for (const k of ['twins', 'tubes', 'stones', 'hidden', 'flowers']) s.seen['obs_' + k] = true;
+      for (const k of ['twins', 'tubes', 'stones', 'hidden', 'flowers', 'boxes', 'locks']) s.seen['obs_' + k] = true;
       const { loadLevel } = await import('/src/levels.ts');
       window.__game.scene.getScenes(true)[0].scene.start('Game', { level: await loadLevel(25) });
     });
@@ -239,6 +239,63 @@ try {
     await shot('20-nivel-falhado');
     const lives = await page.evaluate(() => window.__app.save.lives);
     if (lives !== 4) throw new Error(`vidas depois de falhar: ${lives}`);
+  });
+
+  await step('caixas e cadeados com tutorial (nível 104)', async () => {
+    await page.evaluate(async () => {
+      const s = window.__app.save;
+      s.level = 104;
+      s.seen.obs_boxes = false;
+      s.seen.obs_locks = false;
+      const { loadLevel } = await import('/src/levels.ts');
+      window.__game.scene.getScenes(true)[0].scene.start('Game', { level: await loadLevel(104) });
+    });
+    await page.waitForFunction(() => window.__game.scene.isActive('Game'), null, { timeout: 10000 });
+    await wait(1800);
+    await shot('21-tutorial-caixas');
+    // fecha os tutoriais (caixas e depois cadeados)
+    for (let k = 0; k < 2; k++) {
+      await page.evaluate(async () => {
+        const { closeTopModal } = await import('/src/ui/Modal.ts');
+        closeTopModal(window.__game.scene.getScene('Game'));
+      });
+      await wait(900);
+      if (k === 0) await shot('22-tutorial-cadeados');
+    }
+    await page.waitForFunction(() => window.__game.scene.getScene('Game')?.state === 'play', null, { timeout: 20000 });
+    await wait(600);
+    await shot('23-caixas-e-cadeado');
+    const res = await page.evaluate(() => {
+      const g = window.__game.scene.getScene('Game');
+      const e = g.engine;
+      const out = { boxes: e.boxCells.length, locks: e.locks.length, boxOpen: 0, lockOpen: 0 };
+      // tocar numa peça com cadeado não faz nada
+      const lockedView = [...g.views.values()].find((v) => e.isLocked(e.pieces.get(v.id)) && e.columns[e.columnOf(v.id)]?.[0] === v.id);
+      if (lockedView) {
+        lockedView.img.emit('pointerdown');
+        out.lockedRefused = e.slotOf(lockedView.id) < 0;
+      }
+      const count = (evs) => {
+        for (const ev of evs) {
+          if (ev.type === 'boxOpen') out.boxOpen++;
+          if (ev.type === 'lockOpen') out.lockOpen++;
+        }
+        g.handleEvents(evs);
+      };
+      for (const c of g.level.solution) {
+        count(e.runToQuiescence());
+        e.tap(c);
+        count(e.flush());
+        g.renderColumns(false);
+      }
+      count(e.runToQuiescence());
+      out.won = e.isWon();
+      return out;
+    });
+    console.log('    ', JSON.stringify(res));
+    if (!res.won || res.boxOpen !== res.boxes || res.lockOpen !== res.locks || res.locks < 1 || res.boxes < 1) throw new Error('caixas/cadeados: ' + JSON.stringify(res));
+    if (res.lockedRefused === false) throw new Error('uma peça com cadeado entrou na bandeja');
+    await wait(1200);
   });
 
   await step('acelerar 2x e jogo grande (nível 280)', async () => {
