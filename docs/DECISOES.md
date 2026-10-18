@@ -13,6 +13,21 @@ A especificação deixa algumas coisas em aberto. Tomei estas decisões para nã
 | Se viste 1 curto e saíste, o progresso fica guardado até ao fim do dia | Não perder o anúncio já visto | |
 | As recompensas "10 min x2" do Tesouro usam o mesmo tempo 2x | Coerência | |
 
+## Visual moderno (pedido da Jp, substitui parte da secção 7 da especificação)
+
+- A Jp achou o primeiro visual "rústico e demasiado criança". O jogo passou para um estilo **moderno e premium**:
+  fundo noturno índigo/ameixa com brilhos cor de mel, rosa e azul, e favos muito subtis.
+- Blocos e peças em **gema/vidro** com brilho e um pequeno espaço entre blocos. Já **não há contornos pretos grossos**.
+- Janelas em **vidro fosco escuro**, com o título numa etiqueta em pílula. O botão de fechar continua sempre visível.
+- Botões em pílula com gradiente e um brilho suave da própria cor. As cores são mais vivas (verde-esmeralda, azul,
+  violeta, mel).
+- Letra única **Outfit** (SIL OFL 1.1), em vez de Baloo 2 e Nunito. As licenças, os créditos e o `assets/CREDITS.md`
+  foram atualizados.
+- As abelhas mantêm a personalidade, mas com traço fino e asas de vidro.
+- Ícone, splash e imagens da loja foram gerados de novo no mesmo estilo.
+- Cores e letra ficam num só sítio (`src/ui/theme.ts`), por isso mudar o visual outra vez é fácil.
+- A lógica do jogo e os níveis não mudaram.
+
 ## Economia e preços (inventados por mim - confirma)
 - Moedas de vitória 20/40/60, vidas 5 com 1 a cada 30 min (da especificação).
 - Reforços: +1 Ranhura 250, Baralhar 150, Pinça 200, Flor-íman 300 moedas (dentro de 150-300).
