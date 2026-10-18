@@ -11,7 +11,7 @@ import { DEFAULT_SLOTS, GameEngine } from './engine';
 import { countBlocks, validateLevel } from './level';
 import { hashInts, Rng } from './rng';
 import { lossRate, playGreedy, replay, solve } from './solver';
-import type { Difficulty, FlowerDef, LevelData, PieceDef, StoneDef } from './types';
+import type { BoxDef, Difficulty, FlowerDef, LevelData, LockDef, PieceDef, StoneDef } from './types';
 import { charColor } from './types';
 
 export interface ArtGrid {
@@ -28,9 +28,11 @@ export interface Obstacles {
   stones: boolean;
   hidden: boolean;
   flowers: boolean;
+  boxes: boolean;
+  locks: boolean;
 }
 
-/** Obstáculos que podem aparecer em cada nível (secção 2.3). */
+/** Obstáculos que podem aparecer em cada nível (secção 2.3). O 1.º nível de cada um tem-no sempre. */
 export function obstaclesFor(levelId: number): Obstacles {
   return {
     twins: levelId >= 11,
@@ -38,6 +40,8 @@ export function obstaclesFor(levelId: number): Obstacles {
     stones: levelId >= 31,
     hidden: levelId >= 41,
     flowers: levelId >= 61,
+    boxes: levelId >= 81,
+    locks: levelId >= 101,
   };
 }
 
@@ -211,6 +215,67 @@ function placeFlowers(base: LevelData, rng: Rng, counts: number[], stones: Stone
   return flowers;
 }
 
+/** Caixas de 2x2 a 3x3 sobre blocos normais, afastadas umas das outras e das pedras/flores. */
+function placeBoxes(base: LevelData, rng: Rng, total: number): BoxDef[] {
+  const boxes: BoxDef[] = [];
+  const taken = new Set([...(base.stones ?? []), ...(base.flowers ?? [])].map((o) => `${o.x},${o.y}`));
+  const count = rng.int(1, Math.min(3, 1 + Math.floor(total / 500)));
+  const sizes: [number, number][] = base.w >= 24 ? [[2, 2], [3, 2], [2, 3], [3, 3]] : [[2, 2], [3, 2], [2, 3]];
+  const cell = (x: number, y: number) => charColor(base.grid[y]?.[x] ?? '.');
+  for (let k = 0; k < count * 40 && boxes.length < count; k++) {
+    const [bw, bh] = rng.pick(sizes);
+    const x0 = rng.int(1, base.w - bw - 1);
+    const y0 = rng.int(1, base.h - bh - 1);
+    let ok = true;
+    // a caixa e uma margem de 1 à volta não podem tocar noutras caixas nem em pedras/flores
+    for (let y = y0 - 1; y <= y0 + bh && ok; y++)
+      for (let x = x0 - 1; x <= x0 + bw && ok; x++) {
+        const inside = x >= x0 && x < x0 + bw && y >= y0 && y < y0 + bh;
+        if (taken.has(`${x},${y}`) || boxes.some((b) => x >= b.x - 1 && x <= b.x + b.w && y >= b.y - 1 && y <= b.y + b.h)) ok = false;
+        if (inside && cell(x, y) < 0) ok = false;
+      }
+    if (!ok) continue;
+    let around = 0;
+    for (let x = x0; x < x0 + bw; x++) around += (cell(x, y0 - 1) >= 0 ? 1 : 0) + (cell(x, y0 + bh) >= 0 ? 1 : 0);
+    for (let y = y0; y < y0 + bh; y++) around += (cell(x0 - 1, y) >= 0 ? 1 : 0) + (cell(x0 + bw, y) >= 0 ? 1 : 0);
+    if (around < 4) continue;
+    const lo = Math.ceil(around * 0.35);
+    boxes.push({ x: x0, y: y0, w: bw, h: bh, n: rng.int(lo, Math.max(lo, Math.floor(around * 0.7))) });
+  }
+  return boxes;
+}
+
+/**
+ * Cadeado escolhido a partir da solução: a cor fechada só é tocada (na solução) depois de já
+ * se terem recolhido N blocos da cor da chave, por isso o nível continua resolúvel.
+ */
+export function chooseLock(level: LevelData, rng: Rng): LockDef | null {
+  const pieces = level.columns.flat();
+  const tubeKids = new Set(pieces.filter((p) => p.tube !== undefined).map((p) => p.tube));
+  const bad = new Set<number>();
+  for (const p of pieces) if (p.twin !== undefined || p.tube !== undefined || tubeKids.has(p.id)) bad.add(p.c);
+  const e = new GameEngine(level, DEFAULT_SLOTS);
+  e.recording = false;
+  const before = new Map<number, number[]>();
+  for (const col of level.solution ?? []) {
+    e.runToQuiescence();
+    const c = e.pieces.get(e.columns[col][0])!.color;
+    if (!before.has(c)) before.set(c, Array.from(e.colorTotal, (t, k) => t - e.colorRemaining[k]));
+    e.tap(col);
+  }
+  const options: { c: number; key: number; got: number }[] = [];
+  for (const [c, got] of before) {
+    if (bad.has(c)) continue;
+    got.forEach((n, key) => {
+      if (key !== c && n >= 8) options.push({ c, key, got: n });
+    });
+  }
+  if (options.length === 0) return null;
+  const o = rng.pick(options);
+  const hi = Math.min(o.got, 60);
+  return { c: o.c, key: o.key, n: rng.int(Math.max(5, Math.round(hi * 0.5)), hi) };
+}
+
 function hardness(greedyWins: boolean, loss: number): number {
   return (greedyWins ? 0 : 1) + loss;
 }
@@ -308,12 +373,18 @@ export function generateLevel(params: GenParams): GenOutcome {
     if (obstacles.flowers && rng.chance(0.5)) base.flowers = placeFlowers(base, rng, countBlocks(base), base.stones ?? []);
     if (!base.stones?.length) delete base.stones;
     if (!base.flowers?.length) delete base.flowers;
+    if (obstacles.boxes && (id === 81 || rng.chance(0.55))) base.boxes = placeBoxes(base, rng, total);
+    if (!base.boxes?.length) delete base.boxes;
     // A dificuldade sobe um pouco com tentativas falhadas.
     const holdProb = Math.min(0.75, HOLD[target] + (target === 'normal' ? 0 : a * 0.015));
     const holdFree = target === 'normal' ? 3 : 2;
     const built = construct(base, rng, obstacles, { holdProb, holdFree, twinProb: 0.12, tubeProb: 0.1, avgPiece });
     if (!built) continue;
     const level: LevelData = { ...base, columns: built.columns, solution: built.solution };
+    if (obstacles.locks && (id === 101 || rng.chance(0.45))) {
+      const lock = chooseLock(level, rng);
+      if (lock) level.locks = [lock];
+    }
     const errors = validateLevel(level);
     if (errors.length) throw new Error(errors.join('\n'));
     if (!replay(level, built.solution)) throw new Error(`Nível ${id}: a solução construída não ganha (erro no gerador)`);
