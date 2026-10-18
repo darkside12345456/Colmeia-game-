@@ -186,7 +186,7 @@
   },
   "credits": {
     "title": "Créditos e licenças",
-    "text": "Colmeia Doce - jogo original. Arte, personagens, sons e música feitos por código para este jogo.\n\nLetras: Baloo 2 e Nunito (SIL Open Font License 1.1).\nMotor de jogo: Phaser (licença MIT).\nApp: Capacitor (licença MIT).\nAnúncios: Google Mobile Ads / AdMob (termos da Google).\nCompras: RevenueCat (licença MIT do SDK).\n\nTextos completos das licenças em licenses/ no código do jogo."
+    "text": "Colmeia Doce - jogo original. Arte, personagens, sons e música feitos por código para este jogo.\n\nLetra: Outfit (SIL Open Font License 1.1).\nMotor de jogo: Phaser (licença MIT).\nApp: Capacitor (licença MIT).\nAnúncios: Google Mobile Ads / AdMob (termos da Google).\nCompras: RevenueCat (licença MIT do SDK).\n\nTextos completos das licenças em licenses/ no código do jogo."
   },
   "daily": {
     "title": "Prémio diário",

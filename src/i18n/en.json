@@ -186,7 +186,7 @@
   },
   "credits": {
     "title": "Credits and licences",
-    "text": "Colmeia Doce - an original game. Art, characters, sounds and music made with code for this game.\n\nFonts: Baloo 2 and Nunito (SIL Open Font License 1.1).\nGame engine: Phaser (MIT licence).\nApp: Capacitor (MIT licence).\nAds: Google Mobile Ads / AdMob (Google terms).\nPurchases: RevenueCat (MIT licence for the SDK).\n\nFull licence texts in licenses/ in the game source."
+    "text": "Colmeia Doce - an original game. Art, characters, sounds and music made with code for this game.\n\nFont: Outfit (SIL Open Font License 1.1).\nGame engine: Phaser (MIT licence).\nApp: Capacitor (MIT licence).\nAds: Google Mobile Ads / AdMob (Google terms).\nPurchases: RevenueCat (MIT licence for the SDK).\n\nFull licence texts in licenses/ in the game source."
   },
   "daily": {
     "title": "Daily gift",

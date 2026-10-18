@@ -2,8 +2,7 @@
 
 | Componente | Licença | Ficheiro |
 |---|---|---|
-| Baloo 2 (letra) | SIL Open Font License 1.1 | OFL-Baloo2.txt |
-| Nunito (letra) | SIL Open Font License 1.1 | OFL-Nunito.txt |
+| Outfit (letra) | SIL Open Font License 1.1 | OFL-Outfit.txt |
 | Phaser 3 (motor de jogo) | MIT | MIT-Phaser.md |
 | Capacitor (app Android) e plugins oficiais @capacitor/* | MIT | MIT-Capacitor.txt |
 | @capacitor-community/admob | MIT | MIT-capacitor-community-admob.txt |
