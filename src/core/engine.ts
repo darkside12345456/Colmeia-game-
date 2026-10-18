@@ -10,7 +10,7 @@
 //   quadro) e entrega-o na colmeia (o número da peça desce 1).
 // - Tudo é guiado por eventos com tempo exato, por isso o resultado não depende dos fps.
 import { Rng } from './rng';
-import { charColor, type LevelData } from './types';
+import { charColor, type LevelData, type PieceDef } from './types';
 
 export const DEFAULT_SLOTS = 5;
 export const MAX_SLOTS = 7;
@@ -380,6 +380,33 @@ export class GameEngine {
     }
     this.scheduleLaunches();
     return true;
+  }
+
+  /**
+   * Usado pelo gerador de níveis: cria uma peça nova diretamente na bandeja ('slot')
+   * ou no fim de uma coluna (opcionalmente presa por tubo a outra peça).
+   */
+  injectPiece(def: PieceDef, where: 'slot' | number, tubeParent = -1): void {
+    const p: RPiece = {
+      id: def.id,
+      color: def.c,
+      total: def.n,
+      remaining: def.n,
+      inFlight: 0,
+      twin: def.twin ?? -1,
+      tubeChild: -1,
+      tubeParent,
+      hidden: false,
+    };
+    this.pieces.set(p.id, p);
+    if (tubeParent >= 0) this.pieces.get(tubeParent)!.tubeChild = p.id;
+    if (where === 'slot') {
+      this.placeInSlot(p.id, 'tap', -1);
+      this.scheduleLaunches();
+    } else {
+      while (this.columns.length <= where) this.columns.push([]);
+      this.columns[where].push(p.id);
+    }
   }
 
   /** Reforço "+1 Ranhura" (e "Continuar"). */
