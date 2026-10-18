@@ -1,0 +1,28 @@
+# Configuração do gitleaks (verificação de segredos) - secção 11.1
+# Usa as regras por defeito e acrescenta regras específicas deste projeto.
+title = "Colmeia Doce gitleaks config"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "revenuecat-secret-key"
+description = "Chave SECRETA da RevenueCat (sk_...) - nunca pode estar na app"
+regex = '''\bsk_[A-Za-z0-9]{20,}\b'''
+tags = ["key", "revenuecat"]
+
+[[rules]]
+id = "google-service-account"
+description = "Conta de serviço Google (JSON com private_key)"
+regex = '''"type"\s*:\s*"service_account"'''
+tags = ["key", "google"]
+
+[allowlist]
+description = "Ficheiros de exemplo e IDs de teste públicos da AdMob"
+paths = [
+  '''\.env\.example$''',
+  '''package-lock\.json$''',
+]
+regexes = [
+  '''ca-app-pub-3940256099942544''',
+]

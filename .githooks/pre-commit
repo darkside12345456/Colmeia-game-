@@ -1,0 +1,7 @@
+#!/bin/sh
+# Antes de cada commit: segredos (gitleaks/verificação embutida) + npm audit (secção 11.1)
+node tools/check-secrets.mjs || exit 1
+npm audit --omit=dev --audit-level=high || {
+  echo "[pre-commit] npm audit encontrou vulnerabilidades graves nas dependências da app."
+  exit 1
+}

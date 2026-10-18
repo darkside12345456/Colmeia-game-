@@ -1,0 +1,47 @@
+{
+  "name": "colmeia-doce",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Colmeia Doce - jogo de puzzle casual com abelhas (Android, Phaser 3 + Capacitor)",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "node tools/smoke-test.mjs",
+    "art": "tsx tools/make-art.ts",
+    "levels": "tsx tools/generate-levels.ts",
+    "levels:report": "tsx tools/level-report.ts",
+    "secrets": "node tools/check-secrets.mjs",
+    "audit": "npm audit --omit=dev --audit-level=high",
+    "check": "npm run secrets && npm run lint && npm run typecheck && npm test",
+    "prepare": "node tools/install-hooks.mjs",
+    "cap:sync": "npm run build && npx cap sync android",
+    "cap:open": "npx cap open android"
+  },
+  "dependencies": {
+    "@fontsource/baloo-2": "5.3.0",
+    "@fontsource/nunito": "5.3.0",
+    "phaser": "3.90.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "22.20.5",
+    "@types/pngjs": "6.0.5",
+    "eslint": "10.0.1",
+    "globals": "17.13.0",
+    "pngjs": "7.0.0",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.2",
+    "vite": "8.3.4",
+    "vitest": "5.0.5"
+  }
+}

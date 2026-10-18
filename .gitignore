@@ -1,0 +1,43 @@
+# Dependências e builds
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.vite/
+test-results/
+playwright-report/
+
+# Android / Capacitor (pastas de build)
+android/app/build/
+android/build/
+android/.gradle/
+android/.idea/
+android/local.properties
+android/app/release/
+android/app/debug/
+android/capacitor-cordova-android-plugins/build/
+*.apk
+*.aab
+*.idsig
+
+# Segredos e chaves (secção 11.1) - NUNCA no Git
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.p12
+*.pem
+key.properties
+keystore.properties
+google-services.json
+GoogleService-Info.plist
+service-account*.json
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+*.log
+.idea/
+.vscode/*
+!.vscode/extensions.json
