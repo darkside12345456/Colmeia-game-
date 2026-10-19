@@ -13,6 +13,19 @@ A especificação deixa algumas coisas em aberto. Tomei estas decisões para nã
 | Se viste 1 curto e saíste, o progresso fica guardado até ao fim do dia | Não perder o anúncio já visto | |
 | As recompensas "10 min x2" do Tesouro usam o mesmo tempo 2x | Coerência | |
 
+## Mais desafios: gelo, chave escondida, correntes e peças a dormir (pedido da Jp)
+
+- **Peças geladas (121+):** o número no floco é quantas peças ainda tens de completar.
+- **Chave escondida (141+):** em alguns cadeados a chave está num bloco do quadro (com a chave desenhada).
+- **Correntes (161+):** a peça presa solta-se quando a peça ligada entrar na bandeja (a corrente vê-se entre as duas).
+- **Peças a dormir (181+):** acordam quando a cor ao lado da lua for toda recolhida.
+- Todas as condições são tiradas da solução do nível (cumprem-se antes de a peça ser precisa), por isso o nível
+  continua resolúvel; o solver volta a confirmar e a validação recusa casos impossíveis (ciclos de correntes,
+  corrente na mesma coluna, chave numa cor fechada, gelo/corrente em gémeas ou tubos).
+- O "Baralhar" não mexe nestas peças (para não criar bloqueios).
+- **Ao tocar numa peça, os blocos dessa cor piscam no quadro**: ajuda a ver onde estão os N blocos (alguns estão
+  por dentro, ainda inalcançáveis, ou debaixo de pedras, flores e caixas).
+
 ## Novos desafios: caixas e cores com cadeado (pedido da Jp)
 
 - **Caixas (nível 81+, em mais de metade dos níveis seguintes):** tapam um retângulo de 2x2 a 3x3 blocos. O número desce 1 por
