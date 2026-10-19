@@ -7,7 +7,7 @@ import { backgroundTexture, boxTexture, frameTexture } from '../art/textures';
 import { GameEngine, KIND_FLOWER, KIND_STONE, MAX_SLOTS, type Bee, type EngineEvent, type RPiece } from '../core/engine';
 import { colorHex } from '../core/palette';
 import { smartShuffle } from '../core/solver';
-import type { LevelData } from '../core/types';
+import { isCellLock, type LevelData } from '../core/types';
 import { formatDuration, t } from '../i18n';
 import { BOOSTERS, config, type BoosterId } from '../meta/config';
 import { consumeSpeed, introduceBoosters, isBoosterUnlocked, recordLoss, recordWin, toggleSpeed, useBooster } from '../meta/economy';
@@ -38,6 +38,11 @@ interface PieceView {
   img: Phaser.GameObjects.Image;
   num: Phaser.GameObjects.Text;
   lock: Phaser.GameObjects.Image;
+  /** gelo / corrente / a dormir */
+  ice: Phaser.GameObjects.Image;
+  gateIcon: Phaser.GameObjects.Image;
+  gateLabel: Phaser.GameObjects.Text;
+  gateDot: Phaser.GameObjects.Image;
   id: number;
   hiddenShown: boolean;
 }
@@ -57,7 +62,11 @@ const OBSTACLE_TUTORIALS: [string, (l: LevelData) => boolean][] = [
   ['hidden', (l) => l.columns.flat().some((p) => p.hidden)],
   ['flowers', (l) => !!l.flowers?.length],
   ['boxes', (l) => !!l.boxes?.length],
-  ['locks', (l) => !!l.locks?.length],
+  ['locks', (l) => !!l.locks?.some((k) => !isCellLock(k))],
+  ['keyCell', (l) => !!l.locks?.some((k) => isCellLock(k))],
+  ['ice', (l) => l.columns.flat().some((p) => p.ice !== undefined)],
+  ['chains', (l) => l.columns.flat().some((p) => p.chain !== undefined)],
+  ['wait', (l) => l.columns.flat().some((p) => p.wait !== undefined)],
 ];
 
 export class GameScene extends BaseScene {
@@ -80,6 +89,7 @@ export class GameScene extends BaseScene {
   private flowerDots = new Map<number, Phaser.GameObjects.Image>();
   private boxViews: { img: Phaser.GameObjects.Image; label: Phaser.GameObjects.Text }[] = [];
   private keyChips: { c: Phaser.GameObjects.Container; label: Phaser.GameObjects.Text; lock: number }[] = [];
+  private keyCells = new Map<number, Phaser.GameObjects.Image[]>();
   private slotBgs: Phaser.GameObjects.Image[] = [];
   private views = new Map<number, PieceView>();
   private bees = new Map<number, BeeView>();
@@ -113,6 +123,7 @@ export class GameScene extends BaseScene {
     this.stoneLabels = new Map();
     this.boxViews = [];
     this.keyChips = [];
+    this.keyCells = new Map();
     this.flowerDots = new Map();
     this.slotBgs = [];
     this.views = new Map();
@@ -216,7 +227,9 @@ export class GameScene extends BaseScene {
       g.lineStyle(2, hex(THEME.accent), 0.6).strokeRoundedRect(-64, -27, 128, 54, RADIUS.chip);
       c.add(g);
       c.add(this.add.image(-42, 0, 'ic_key').setDisplaySize(46, 46));
-      c.add(this.add.image(-10, 0, `block_${this.level.colors[l.key]}`).setDisplaySize(30, 30));
+      // chave por blocos de uma cor: mostra essa cor; chave escondida: mostra o bloco onde está
+      const keyColor = isCellLock(l) ? this.engine.color[l.y * this.level.w + l.x] : l.key;
+      c.add(this.add.image(-10, 0, `block_${this.level.colors[keyColor]}`).setDisplaySize(30, 30));
       const label = txt(this, 32, -1, '', 24);
       c.add(label);
       this.keyChips.push({ c, label, lock: k });
@@ -238,8 +251,7 @@ export class GameScene extends BaseScene {
 
   private refreshKeys(): void {
     for (const k of this.keyChips) {
-      const l = this.engine.locks[k.lock];
-      k.label.setText(`${this.engine.keyProgress(k.lock)}/${l.n}`);
+      k.label.setText(`${this.engine.keyProgress(k.lock)}/${this.engine.keyNeed(k.lock)}`);
       if (k.label.width > 60) k.label.setScale(60 / k.label.width);
     }
   }
@@ -305,6 +317,19 @@ export class GameScene extends BaseScene {
         this.flowerDots.set(i, dot);
       }
     }
+    // chaves escondidas em blocos do quadro
+    for (const l of this.level.locks ?? []) {
+      if (!isCellLock(l)) continue;
+      const cell = l.y * w + l.x;
+      const { x, y } = this.cellPos(cell);
+      // brilho cor de mel por trás + chave maior do que o bloco, para se ver bem
+      const sz = Math.max(30, this.cell * 1.7);
+      const glow = this.add.image(x, y, 'px_dot').setDisplaySize(sz * 1.6, sz * 1.6).setTint(0xffc23d).setAlpha(0.9).setDepth(11);
+      const key = this.add.image(x, y, 'ic_key').setDisplaySize(sz, sz).setDepth(11.5);
+      this.tweens.add({ targets: key, angle: { from: -12, to: 12 }, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      this.tweens.add({ targets: glow, alpha: 0.45, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      this.keyCells.set(cell, [key, glow]);
+    }
     // caixas por cima dos blocos
     (this.level.boxes ?? []).forEach((b, k) => {
       const x = this.bx + (b.x + b.w / 2) * this.cell;
@@ -367,8 +392,12 @@ export class GameScene extends BaseScene {
     const img = this.add.image(0, 0, `piece_${this.level.colors[p.color]}`);
     const num = txt(this, 0, -4, String(p.remaining), 54);
     const lock = this.add.image(36, -36, 'ic_lock').setDisplaySize(62, 62).setVisible(false);
-    c.add([img, num, lock]);
-    const v: PieceView = { c, img, num, lock, id, hiddenShown: false };
+    const ice = this.add.image(0, 0, 'ice_overlay').setVisible(false);
+    const gateIcon = this.add.image(-38, -38, 'ic_snow').setDisplaySize(58, 58).setVisible(false);
+    const gateLabel = txt(this, -38, -39, '', 32, { color: '#0B3A66', stroke: false, weight: '700' }).setVisible(false);
+    const gateDot = this.add.image(-14, -20, 'block_sol').setDisplaySize(30, 30).setVisible(false);
+    c.add([img, ice, num, lock, gateIcon, gateDot, gateLabel]);
+    const v: PieceView = { c, img, num, lock, ice, gateIcon, gateLabel, gateDot, id, hiddenShown: false };
     img.setInteractive({ useHandCursor: true });
     img.on('pointerdown', () => this.onPieceDown(v));
     this.views.set(id, v);
@@ -401,9 +430,8 @@ export class GameScene extends BaseScene {
         this.setHidden(v, p.hidden && !front);
         v.c.setDepth(30 - depth);
         const alpha = front ? 1 : 0.55;
-        const locked = this.engine.isLocked(p) && !v.hiddenShown;
-        v.lock.setVisible(locked);
-        v.img.setTint(locked ? 0x8f88b0 : front ? 0xffffff : 0xb4acd6);
+        const blocked = this.refreshGate(v);
+        v.img.setTint(blocked ? 0x8f88b0 : front ? 0xffffff : 0xb4acd6);
         if (!animate || isNew) {
           v.c.setPosition(x, isNew && animate ? y + 60 : y).setScale(scale).setAlpha(isNew && animate ? 0 : alpha);
           if (isNew && animate) this.tweens.add({ targets: v.c, y, alpha, duration: dur(260), ease: 'Quad.easeOut' });
@@ -421,6 +449,53 @@ export class GameScene extends BaseScene {
     }
   }
 
+  /** Mostra cadeado / gelo / corrente / a dormir de uma peça nas colunas. Devolve true se não se pode tocar. */
+  private refreshGate(v: PieceView): boolean {
+    const e = this.engine;
+    const p = e.pieces.get(v.id);
+    const show = !!p && !v.hiddenShown && e.slotOf(v.id) < 0;
+    const locked = show && e.isLocked(p);
+    const gate = show ? e.gateOf(p) : null;
+    v.lock.setVisible(locked);
+    v.ice.setVisible(gate === 'frozen');
+    v.gateIcon.setVisible(!!gate);
+    v.gateLabel.setVisible(gate === 'frozen');
+    v.gateDot.setVisible(gate === 'asleep');
+    if (gate === 'frozen') {
+      v.gateIcon.setTexture('ic_snow');
+      v.gateLabel.setText(String(e.iceLeft(p!)));
+    } else if (gate === 'chained') v.gateIcon.setTexture('ic_chain');
+    else if (gate === 'asleep') {
+      v.gateIcon.setTexture('ic_moon');
+      v.gateDot.setTexture(`block_${this.level.colors[p!.wait]}`);
+    }
+    return locked || !!gate;
+  }
+
+  /** Atualiza só os desenhos das condições das peças visíveis nas colunas (sem as mexer). */
+  private refreshGates(): void {
+    this.engine.columns.forEach((col) =>
+      col.slice(0, 3).forEach((id, depth) => {
+        const v = this.views.get(id);
+        if (!v || this.engine.slotOf(id) >= 0) return;
+        const blocked = this.refreshGate(v);
+        v.img.setTint(blocked ? 0x8f88b0 : depth === 0 ? 0xffffff : 0xb4acd6);
+      }),
+    );
+  }
+
+  /** Os blocos de uma cor piscam no quadro (para se ver onde estão os N blocos da peça). */
+  private highlightColor(color: number): void {
+    const imgs: Phaser.GameObjects.Image[] = [];
+    this.blocks.forEach((img, i) => {
+      if (img && this.engine.color[i] === color && this.engine.kind[i] !== 0) imgs.push(img);
+    });
+    if (!imgs.length) return;
+    this.tweens.killTweensOf(imgs.filter((im) => im.alpha !== 1));
+    imgs.forEach((im) => im.setAlpha(1));
+    this.tweens.add({ targets: imgs, alpha: 0.25, duration: dur(120), yoyo: true, repeat: 1, ease: 'Sine.easeInOut' });
+  }
+
   /** Barras das gémeas e tubos (redesenhadas a cada frame). */
   private drawLinks(): void {
     const g = this.links;
@@ -435,6 +510,20 @@ export class GameScene extends BaseScene {
           g.lineStyle(20, 0x07041a, 0.45).lineBetween(a.x, a.y, b.x, b.y);
           g.lineStyle(12, 0xffb020, 1).lineBetween(a.x, a.y, b.x, b.y);
           g.fillStyle(0xffffff, 0.6).fillCircle((a.x + b.x) / 2, (a.y + b.y) / 2, 5);
+        }
+      }
+      if (p.chain >= 0 && e.gateOf(p) === 'chained') {
+        const a = pos(p.id);
+        const b = pos(p.chain);
+        if (a && b && a.visible && b.visible && e.slotOf(p.id) < 0) {
+          // elos de corrente entre as duas peças
+          const n = Math.max(3, Math.round(Phaser.Math.Distance.Between(a.x, a.y, b.x, b.y) / 22));
+          for (let k = 1; k < n; k++) {
+            const x = a.x + ((b.x - a.x) * k) / n;
+            const y = a.y + ((b.y - a.y) * k) / n;
+            g.lineStyle(5, 0x07041a, 0.4).strokeCircle(x, y + 2, 7);
+            g.lineStyle(4, 0xdce3ec, 0.95).strokeCircle(x, y, 7);
+          }
         }
       }
       if (p.tubeChild >= 0) {
@@ -456,11 +545,12 @@ export class GameScene extends BaseScene {
     const e = this.engine;
     const id = v.id;
     if (e.slotOf(id) >= 0) return;
-    // resposta imediata: a peça afunda
+    // resposta imediata: a peça afunda e os blocos da cor dela piscam no quadro
     this.tweens.add({ targets: v.c, scaleY: v.c.scaleY * 0.86, scaleX: v.c.scaleX * 1.08, duration: 50, yoyo: true });
+    if (!v.hiddenShown) this.highlightColor(e.pieces.get(id)!.color);
     if (this.mode === 'tweezers') {
       if (!e.canTweezers(id)) {
-        this.feedbackError(v, this.lockMessage(id) ?? t('game.noSpace'));
+        this.feedbackError(v, this.lockMessage(id) ?? (e.gateOf(e.pieces.get(id)!) ? this.gateMessage(id) : t('game.noSpace')));
         return;
       }
       useBooster(app.save, 'tweezers');
@@ -482,7 +572,9 @@ export class GameScene extends BaseScene {
       const msg =
         check === 'locked'
           ? (this.lockMessage(id) ?? '')
-          : check === 'tube' ? t('game.tube') : check === 'twinNotFront' ? t('game.twinNotFront') : p.twin >= 0 ? t('game.noSpaceTwin') : t('game.noSpace');
+          : check === 'frozen' || check === 'chained' || check === 'asleep'
+            ? this.gateMessage(id)
+            : check === 'tube' ? t('game.tube') : check === 'twinNotFront' ? t('game.twinNotFront') : p.twin >= 0 ? t('game.noSpaceTwin') : t('game.noSpace');
       this.feedbackError(v, msg);
       return;
     }
@@ -503,7 +595,25 @@ export class GameScene extends BaseScene {
     const k = e.lockOfColor[q.color];
     const chip = this.keyChips.find((c) => c.lock === k);
     if (chip) this.tweens.add({ targets: chip.c, scale: 1.15, duration: 90, yoyo: true, repeat: 1 });
-    return t('game.locked', { n: e.locks[k].n - e.keyProgress(k) });
+    return isCellLock(e.locks[k]) ? t('game.lockedCell') : t('game.locked', { n: e.keyNeed(k) - e.keyProgress(k) });
+  }
+
+  private gateMessage(id: number): string {
+    const e = this.engine;
+    const p = e.pieces.get(id)!;
+    const q = p.twin >= 0 && e.gateOf(e.pieces.get(p.twin)!) ? e.pieces.get(p.twin)! : p;
+    const gate = e.gateOf(q);
+    if (gate === 'frozen') return t('game.frozen', { n: e.iceLeft(q) });
+    if (gate === 'chained') {
+      const tv = this.views.get(q.chain);
+      if (tv) this.tweens.add({ targets: tv.c, scale: tv.c.scale * 1.12, duration: 110, yoyo: true, repeat: 1 });
+      return t('game.chained');
+    }
+    if (gate === 'asleep') {
+      this.highlightColor(q.wait);
+      return t('game.asleep');
+    }
+    return '';
   }
 
   private feedbackError(v: PieceView, msg: string): void {
@@ -516,7 +626,9 @@ export class GameScene extends BaseScene {
   // ------------------------------------------------------------------ eventos do motor
 
   private handleEvents(events: EngineEvent[]): void {
+    let gatesDirty = false;
     for (const ev of events) {
+      if (ev.type === 'pieceDone' || ev.type === 'enter' || ev.type === 'columnRemove' || ev.type === 'pickup' || ev.type === 'magnet') gatesDirty = true;
       switch (ev.type) {
         case 'enter':
           this.onEnter(ev.pieceId, ev.slot, ev.source);
@@ -574,6 +686,7 @@ export class GameScene extends BaseScene {
           break;
       }
     }
+    if (gatesDirty) this.refreshGates();
   }
 
   private onEnter(id: number, slot: number, source: string): void {
@@ -584,7 +697,7 @@ export class GameScene extends BaseScene {
       v.c.setPosition(this.colX[Math.max(0, col)] ?? L.W / 2, this.rowY[2]);
     }
     this.setHidden(v, false);
-    v.lock.setVisible(false);
+    for (const o of [v.lock, v.ice, v.gateIcon, v.gateLabel, v.gateDot]) o.setVisible(false);
     v.img.setTint(0xffffff);
     v.c.setAlpha(1).setDepth(35);
     const p = this.engine.pieces.get(id)!;
@@ -657,6 +770,7 @@ export class GameScene extends BaseScene {
       if (bv) bv.carry = block;
       else block.destroy();
     }
+    this.takeKeyCell(bee.cell);
     // atualiza contadores das pedras e da chave
     for (const [cell, lab] of this.stoneLabels) lab.setText(String(this.engine.stoneLeft(cell)));
     if (this.keyChips.length) this.refreshKeys();
@@ -750,6 +864,27 @@ export class GameScene extends BaseScene {
     }
   }
 
+  /** A chave escondida neste bloco voa até ao contador da chave. */
+  private takeKeyCell(cell: number): void {
+    const imgs = this.keyCells.get(cell);
+    if (!imgs) return;
+    this.keyCells.delete(cell);
+    const [key, glow] = imgs;
+    this.tweens.killTweensOf(imgs);
+    glow.destroy();
+    const chip = this.keyChips[0]?.c;
+    key.setDepth(300);
+    this.tweens.add({
+      targets: key,
+      x: chip?.x ?? L.W / 2,
+      y: chip?.y ?? 60,
+      scale: key.scale * 1.6,
+      duration: dur(600),
+      ease: 'Quad.easeInOut',
+      onComplete: () => key.destroy(),
+    });
+  }
+
   private onBoxHit(box: number, left: number): void {
     const bv = this.boxViews[box];
     if (!bv) return;
@@ -827,6 +962,7 @@ export class GameScene extends BaseScene {
     burst(this, this.door.x, this.door.y, hex, 24, 70);
     app.audio.play('chest');
     for (const [cell, lab] of this.stoneLabels) lab.setText(String(this.engine.stoneLeft(cell)));
+    for (const cell of cells) this.takeKeyCell(cell);
     if (this.keyChips.length) this.refreshKeys();
   }
 

@@ -199,7 +199,7 @@ try {
         s.boostersIntroduced[k] = true;
         s.boosters[k] = 2;
       }
-      for (const k of ['twins', 'tubes', 'stones', 'hidden', 'flowers', 'boxes', 'locks']) s.seen['obs_' + k] = true;
+      for (const k of ['twins', 'tubes', 'stones', 'hidden', 'flowers', 'boxes', 'locks', 'keyCell', 'ice', 'chains', 'wait']) s.seen['obs_' + k] = true;
       const { loadLevel } = await import('/src/levels.ts');
       window.__game.scene.getScenes(true)[0].scene.start('Game', { level: await loadLevel(25) });
     });
@@ -295,6 +295,62 @@ try {
     console.log('    ', JSON.stringify(res));
     if (!res.won || res.boxOpen !== res.boxes || res.lockOpen !== res.locks || res.locks < 1 || res.boxes < 1) throw new Error('caixas/cadeados: ' + JSON.stringify(res));
     if (res.lockedRefused === false) throw new Error('uma peça com cadeado entrou na bandeja');
+    await wait(1200);
+  });
+
+  await step('gelo, corrente, a dormir e chave escondida (nível 196)', async () => {
+    await page.evaluate(async () => {
+      const s = window.__app.save;
+      s.level = 196;
+      for (const k of ['keyCell', 'ice', 'chains', 'wait']) s.seen['obs_' + k] = false;
+      const { loadLevel } = await import('/src/levels.ts');
+      window.__game.scene.getScenes(true)[0].scene.start('Game', { level: await loadLevel(196) });
+    });
+    await page.waitForFunction(() => window.__game.scene.isActive('Game'), null, { timeout: 10000 });
+    await wait(1800);
+    const names = ['24-tutorial-chave-escondida', '25-tutorial-gelo', '26-tutorial-correntes', '27-tutorial-a-dormir'];
+    for (const n of names) {
+      await shot(n);
+      await page.evaluate(async () => {
+        const { closeTopModal } = await import('/src/ui/Modal.ts');
+        closeTopModal(window.__game.scene.getScene('Game'));
+      });
+      await wait(900);
+    }
+    await page.waitForFunction(() => window.__game.scene.getScene('Game')?.state === 'play', null, { timeout: 20000 });
+    await wait(600);
+    await shot('28-gelo-corrente-dormir');
+    const res = await page.evaluate(() => {
+      const g = window.__game.scene.getScene('Game');
+      const e = g.engine;
+      const out = { refused: 0, gates: [], lockOpen: 0 };
+      // tocar em peças da frente que ainda não se podem jogar não faz nada
+      for (const col of e.columns) {
+        const id = col[0];
+        if (id === undefined) continue;
+        const gate = e.gateOf(e.pieces.get(id)) ?? (e.isLocked(e.pieces.get(id)) ? 'locked' : null);
+        if (!gate) continue;
+        out.gates.push(gate);
+        g.views.get(id)?.img.emit('pointerdown');
+        if (e.slotOf(id) < 0) out.refused++;
+      }
+      const count = (evs) => {
+        for (const ev of evs) if (ev.type === 'lockOpen') out.lockOpen++;
+        g.handleEvents(evs);
+      };
+      for (const c of g.level.solution) {
+        count(e.runToQuiescence());
+        e.tap(c);
+        count(e.flush());
+        g.renderColumns(false);
+      }
+      count(e.runToQuiescence());
+      out.won = e.isWon();
+      out.keyCellsLeft = g.keyCells.size;
+      return out;
+    });
+    console.log('    ', JSON.stringify(res));
+    if (!res.won || res.lockOpen < 1 || res.keyCellsLeft !== 0 || res.refused !== res.gates.length) throw new Error('desafios: ' + JSON.stringify(res));
     await wait(1200);
   });
 

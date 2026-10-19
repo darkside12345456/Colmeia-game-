@@ -55,7 +55,11 @@
     "speedOn": "2x on",
     "speedOff": "2x paused",
     "locked": "Locked! Collect {n} more blocks of the key colour",
-    "keyWon": "Key won! Lock opened"
+    "keyWon": "Key won! Lock opened",
+    "lockedCell": "Locked! Collect the key hidden on the board",
+    "frozen": "Ice! Complete {n} more pieces to melt it",
+    "chained": "Chain! Play the linked piece first",
+    "asleep": "Asleep! Collect all of the shown colour to wake it"
   },
   "boosters": {
     "slot": "+1 Slot",
@@ -282,6 +286,14 @@
     "boxesText": "They cover the blocks underneath. Each block collected right next to a crate lowers its number by 1. At 0, the crate breaks.",
     "locks": "Locked colours",
     "locksText": "Locked pieces cannot be tapped. Collect blocks of the key colour (at the top) to win the key and open the lock.",
+    "keyCell": "Hidden key",
+    "keyCellText": "The key to the lock is inside a block on the board. When a bee collects it, the lock opens.",
+    "ice": "Frozen pieces",
+    "iceText": "The number on the snowflake shows how many pieces you must complete for the ice to melt.",
+    "chains": "Chains",
+    "chainsText": "A chained piece is only released when the piece at the other end of the chain enters the tray.",
+    "wait": "Sleeping pieces",
+    "waitText": "They wake up when the colour next to the moon is fully collected from the board.",
     "gotIt": "Got it!"
   },
   "ads": {

@@ -485,6 +485,30 @@ export function obstacleModal(scene: Phaser.Scene, key: string): Promise<void> {
       ill.add(scene.add.image(80, 0, 'piece_rosa').setDisplaySize(130, 130).setTint(0x8f88b0));
       ill.add(txt(scene, 80, -4, '14', 50));
       ill.add(scene.add.image(122, -42, 'ic_lock').setDisplaySize(70, 70));
+    } else if (key === 'keyCell') {
+      ill.add(scene.add.image(-70, 0, 'block_azul').setDisplaySize(110, 110));
+      ill.add(scene.add.image(-70, 0, 'ic_key').setDisplaySize(100, 100));
+      ill.add(scene.add.image(90, 0, 'piece_rosa').setDisplaySize(120, 120).setTint(0x8f88b0));
+      ill.add(scene.add.image(128, -40, 'ic_lock').setDisplaySize(64, 64));
+    } else if (key === 'ice') {
+      ill.add(scene.add.image(0, 0, 'piece_verde').setDisplaySize(150, 150));
+      ill.add(scene.add.image(0, 0, 'ice_overlay').setDisplaySize(150, 150));
+      ill.add(txt(scene, 0, -4, '18', 60));
+      ill.add(scene.add.image(-46, -46, 'ic_snow').setDisplaySize(68, 68));
+      ill.add(txt(scene, -46, -47, '2', 36, { color: '#0B3A66', stroke: false, weight: '700' }));
+    } else if (key === 'chains') {
+      ill.add(scene.add.image(-90, 0, 'piece_azul').setDisplaySize(120, 120));
+      ill.add(scene.add.image(90, 0, 'piece_rosa').setDisplaySize(120, 120).setTint(0x8f88b0));
+      for (let k = -2; k <= 2; k++) {
+        g.lineStyle(5, 0x07041a, 0.4).strokeCircle(k * 18, 2, 8);
+        g.lineStyle(4, 0xdce3ec, 1).strokeCircle(k * 18, 0, 8);
+      }
+      ill.add(scene.add.image(48, -42, 'ic_chain').setDisplaySize(64, 64));
+    } else if (key === 'wait') {
+      ill.add(scene.add.image(0, 0, 'piece_violeta').setDisplaySize(150, 150).setTint(0x8f88b0));
+      ill.add(txt(scene, 0, -4, '22', 60));
+      ill.add(scene.add.image(-46, -46, 'ic_moon').setDisplaySize(70, 70));
+      ill.add(scene.add.image(-14, -24, 'block_sol').setDisplaySize(36, 36));
     } else if (key === 'hidden') {
       ill.add(scene.add.image(0, 0, 'piece_hidden').setDisplaySize(130, 130));
       ill.add(txt(scene, 0, -4, '?', 64));

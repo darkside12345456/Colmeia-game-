@@ -39,6 +39,7 @@ export function buildTextures(scene: Phaser.Scene): void {
   ensureTexture(scene, 'stone', 64, 64, drawStone);
   ensureTexture(scene, 'piece_hidden', 128, 128, (ctx) => glossyTile(ctx, 10, 8, 108, 108, RADIUS.piece, '#6E6894'));
   ensureTexture(scene, 'slot', 120, 120, drawSlot);
+  ensureTexture(scene, 'ice_overlay', 128, 128, drawIce);
   ensureTexture(scene, 'hive_door', 220, 120, drawHiveDoor);
   ensureTexture(scene, 'cloud', 256, 256, drawBokeh);
   ensureTexture(scene, 'leaf', 48, 48, (ctx) => ICONS.folha(ctx, 48));
@@ -164,6 +165,36 @@ function drawHiveDoor(ctx: Ctx): void {
   ctx.fillStyle = 'rgba(255,255,255,0.5)';
   ellipse(ctx, 70, 34, 16, 4, -0.3);
   ctx.fill();
+}
+
+/** Camada de gelo por cima de uma peça congelada. */
+function drawIce(ctx: Ctx): void {
+  rr(ctx, 10, 8, 108, 108, RADIUS.piece);
+  const g = ctx.createLinearGradient(10, 8, 118, 116);
+  g.addColorStop(0, 'rgba(225,245,255,0.75)');
+  g.addColorStop(0.5, 'rgba(160,215,255,0.45)');
+  g.addColorStop(1, 'rgba(200,235,255,0.7)');
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.save();
+  rr(ctx, 10, 8, 108, 108, RADIUS.piece);
+  ctx.clip();
+  // riscos de gelo
+  ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(22, 40);
+  ctx.lineTo(48, 22);
+  ctx.moveTo(80, 104);
+  ctx.lineTo(108, 80);
+  ctx.moveTo(30, 98);
+  ctx.lineTo(44, 86);
+  ctx.stroke();
+  ctx.restore();
+  rr(ctx, 11, 9, 106, 106, RADIUS.piece);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+  ctx.stroke();
 }
 
 /** Caixa de madeira cor de mel (tapa blocos do quadro). cw x ch em células, 64 px por célula. */

@@ -162,6 +162,61 @@ export const ICONS: Record<string, IconFn> = {
     ctx.fill();
     ctx.restore();
   },
+  snow: (ctx, s) => {
+    // floco de neve: 3 eixos com ramos, sobre um círculo de gelo
+    glossyCircle(ctx, s / 2, s / 2, s * 0.44, '#7CC6FF');
+    ctx.save();
+    ctx.translate(s / 2, s / 2);
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineCap = 'round';
+    ctx.lineWidth = s * 0.06;
+    for (let k = 0; k < 3; k++) {
+      ctx.save();
+      ctx.rotate((k * Math.PI) / 3);
+      ctx.beginPath();
+      ctx.moveTo(0, -s * 0.3);
+      ctx.lineTo(0, s * 0.3);
+      for (const d of [-1, 1]) {
+        ctx.moveTo(0, d * s * 0.17);
+        ctx.lineTo(s * 0.08, d * s * 0.25);
+        ctx.moveTo(0, d * s * 0.17);
+        ctx.lineTo(-s * 0.08, d * s * 0.25);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+    ctx.restore();
+  },
+  chain: (ctx, s) => {
+    // dois elos de corrente prateados entrelaçados
+    const link = (cx: number, cy: number, rot: number) => {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rot);
+      rr(ctx, -s * 0.2, -s * 0.11, s * 0.4, s * 0.22, s * 0.11);
+      ctx.lineWidth = s * 0.11;
+      ctx.strokeStyle = 'rgba(20,12,45,0.45)';
+      ctx.stroke();
+      ctx.lineWidth = s * 0.07;
+      ctx.strokeStyle = '#DCE3EC';
+      ctx.stroke();
+      ctx.restore();
+    };
+    link(s * 0.36, s * 0.6, -Math.PI / 4);
+    link(s * 0.64, s * 0.4, -Math.PI / 4);
+  },
+  moon: (ctx, s) => {
+    // lua em quarto crescente (peça a dormir)
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(s * 0.48, s * 0.52, s * 0.34, 0, Math.PI * 2);
+    ctx.arc(s * 0.62, s * 0.4, s * 0.28, 0, Math.PI * 2, true);
+    strokeFill(ctx, lg(ctx, s * 0.18, s * 0.86, '#FFE08A'), lwOf(s));
+    ctx.restore();
+    ctx.fillStyle = '#FFFFFF';
+    star(ctx, s * 0.78, s * 0.24, s * 0.08, 4, 0.4);
+    ctx.fill();
+  },
   check: (ctx, s) => {
     ctx.beginPath();
     ctx.moveTo(s * 0.2, s * 0.52);

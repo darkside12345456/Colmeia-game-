@@ -55,7 +55,11 @@
     "speedOn": "2x ligado",
     "speedOff": "2x pausado",
     "locked": "Cadeado! Recolhe mais {n} blocos da cor da chave",
-    "keyWon": "Chave ganha! Cadeado aberto"
+    "keyWon": "Chave ganha! Cadeado aberto",
+    "lockedCell": "Cadeado! Apanha a chave escondida no quadro",
+    "frozen": "Gelo! Completa mais {n} peças para derreter",
+    "chained": "Corrente! Joga primeiro a peça ligada",
+    "asleep": "A dormir! Recolhe toda a cor indicada para acordar"
   },
   "boosters": {
     "slot": "+1 Ranhura",
@@ -282,6 +286,14 @@
     "boxesText": "Tapam os blocos por baixo. Cada bloco recolhido mesmo ao lado de uma caixa desce 1 no número. A 0, a caixa parte-se.",
     "locks": "Cores com cadeado",
     "locksText": "As peças com cadeado não se podem tocar. Recolhe os blocos da cor da chave (lá em cima) para ganhar a chave e abrir o cadeado.",
+    "keyCell": "Chave escondida",
+    "keyCellText": "A chave do cadeado está num bloco do quadro. Quando uma abelha o apanhar, o cadeado abre.",
+    "ice": "Peças geladas",
+    "iceText": "O número no floco diz quantas peças tens de completar para o gelo derreter.",
+    "chains": "Correntes",
+    "chainsText": "A peça presa só se solta quando a peça do outro lado da corrente entrar na bandeja.",
+    "wait": "Peças a dormir",
+    "waitText": "Acordam quando a cor ao lado da lua for toda recolhida do quadro.",
     "gotIt": "Percebi!"
   },
   "ads": {
