@@ -13,6 +13,12 @@ export interface PieceDef {
   tube?: number;
   /** Peça escondida: mostra "?" até chegar à fila da frente */
   hidden?: boolean;
+  /** Gelo: só se pode tocar depois de completar este número de peças no nível */
+  ice?: number;
+  /** Corrente: só se pode tocar depois de esta outra peça (id) entrar na bandeja */
+  chain?: number;
+  /** A dormir: só se pode tocar depois de esta cor (índice) ser toda recolhida */
+  wait?: number;
 }
 
 export interface StoneDef {
@@ -39,14 +45,28 @@ export interface BoxDef {
   n: number;
 }
 
-/** Cadeado: as peças da cor c não se podem tocar até se ganhar a chave. */
-export interface LockDef {
+/** Cadeado aberto por blocos recolhidos: N blocos da cor da chave. */
+export interface ColorKeyLock {
   /** Índice da cor bloqueada */
   c: number;
   /** Índice da cor da chave */
   key: number;
   /** Blocos da cor da chave a recolher para ganhar a chave */
   n: number;
+}
+
+/** Cadeado aberto pela chave escondida num bloco do quadro (x, y). */
+export interface CellKeyLock {
+  c: number;
+  x: number;
+  y: number;
+}
+
+/** Cadeado: as peças da cor c não se podem tocar até se ganhar a chave. */
+export type LockDef = ColorKeyLock | CellKeyLock;
+
+export function isCellLock(l: LockDef): l is CellKeyLock {
+  return 'x' in l;
 }
 
 export interface LevelStats {

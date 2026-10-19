@@ -70,3 +70,91 @@ describe('cadeados', () => {
     expect(validateLevel(mk(11)).join()).toContain('cadeado pede 11');
   });
 });
+
+describe('chave escondida no quadro', () => {
+  // 5 verdes em cima (a chave está no do meio), 5 azuis em baixo
+  const grid = ['00000', '11111'];
+  const mk = () => makeLevel(grid, [[p(1, 5)], [p(0, 5)], [], []], { locks: [{ c: 1, x: 2, y: 0 }] });
+
+  it('o cadeado abre quando uma abelha apanha o bloco com a chave', () => {
+    expect(validateLevel(mk())).toEqual([]);
+    const e = new GameEngine(mk());
+    expect(e.checkTap(0)).toBe('locked');
+    expect(e.keyNeed(0)).toBe(1);
+    e.tap(1);
+    const ev = e.runToQuiescence();
+    expect(ev.some((x) => x.type === 'lockOpen')).toBe(true);
+    expect(e.keyProgress(0)).toBe(1);
+    expect(e.checkTap(0)).toBe('ok');
+  });
+
+  it('a chave não pode estar num bloco da cor fechada', () => {
+    const bad = makeLevel(grid, [[p(1, 5)], [p(0, 5)], [], []], { locks: [{ c: 1, x: 2, y: 1 }] });
+    expect(validateLevel(bad).join()).toContain('própria cor fechada');
+  });
+});
+
+describe('gelo, corrente e a dormir', () => {
+  const grid = ['0000011111', '2222233333'];
+
+  it('gelo: a peça só se toca depois de completar N peças', () => {
+    const level = makeLevel(grid, [[p(0, 5)], [p(1, 5, { ice: 2 })], [p(2, 5)], [p(3, 5)]]);
+    expect(validateLevel(level)).toEqual([]);
+    const e = new GameEngine(level);
+    expect(e.checkTap(1)).toBe('frozen');
+    expect(e.iceLeft(e.pieces.get(e.columns[1][0])!)).toBe(2);
+    e.tap(0);
+    e.runToQuiescence();
+    expect(e.checkTap(1)).toBe('frozen');
+    e.tap(2);
+    e.runToQuiescence();
+    expect(e.piecesDone).toBe(2);
+    expect(e.checkTap(1)).toBe('ok');
+  });
+
+  it('corrente: a peça só se toca depois de a peça ligada entrar na bandeja', () => {
+    const a = p(0, 5);
+    const level = makeLevel(grid, [[a], [p(1, 5, { chain: a.id })], [p(2, 5)], [p(3, 5)]]);
+    expect(validateLevel(level)).toEqual([]);
+    const e = new GameEngine(level);
+    expect(e.checkTap(1)).toBe('chained');
+    e.tap(0);
+    expect(e.checkTap(1)).toBe('ok');
+  });
+
+  it('corrente na mesma coluna ou em ciclo é recusada', () => {
+    const a = p(0, 5);
+    const b = p(1, 5);
+    const same = makeLevel(grid, [[{ ...a, chain: b.id }, b], [], [p(2, 5)], [p(3, 5)]]);
+    expect(validateLevel(same).join()).toContain('mesma coluna');
+    const c1 = p(0, 5);
+    const c2 = p(1, 5);
+    c1.chain = c2.id;
+    c2.chain = c1.id;
+    const cycle = makeLevel(grid, [[c1], [c2], [p(2, 5)], [p(3, 5)]]);
+    expect(validateLevel(cycle).join()).toContain('ciclo');
+  });
+
+  it('a dormir: a peça só acorda quando a cor indicada é toda recolhida', () => {
+    const level = makeLevel(grid, [[p(0, 5)], [p(1, 5, { wait: 0 })], [p(2, 5)], [p(3, 5)]]);
+    expect(validateLevel(level)).toEqual([]);
+    const e = new GameEngine(level);
+    expect(e.checkTap(1)).toBe('asleep');
+    e.tap(0);
+    e.runToQuiescence();
+    expect(e.checkTap(1)).toBe('ok');
+    const s = solve(level);
+    expect(s.status).toBe('solved');
+  });
+
+  it('o Baralhar não mexe em peças com gelo, corrente ou a dormir', () => {
+    const a = p(0, 5);
+    const level = makeLevel(grid, [[a, p(2, 3)], [p(1, 5, { chain: a.id })], [p(2, 2), p(3, 2, { ice: 1 })], [p(3, 3)]]);
+    const e = new GameEngine(level);
+    const before = e.columns.map((c) => c.slice());
+    for (let k = 0; k < 10; k++) e.shuffleColumns();
+    expect(e.columns[1][0]).toBe(before[1][0]);
+    expect(e.columns[0][0]).toBe(before[0][0]);
+    expect(e.columns[2][1]).toBe(before[2][1]);
+  });
+});

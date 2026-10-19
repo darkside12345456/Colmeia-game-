@@ -9,10 +9,12 @@
 //   cada abelha reserva o bloco alcançável mais perto da colmeia, apanha-o (o bloco sai do
 //   quadro) e entrega-o na colmeia (o número da peça desce 1).
 // - Caixas tapam blocos; cada bloco recolhido ao lado de uma caixa desconta 1 e a 0 ela parte-se.
-// - Cadeados: as peças de uma cor só se podem tocar depois de recolher N blocos da cor da chave.
+// - Cadeados: as peças de uma cor só se podem tocar depois de recolher N blocos da cor da chave
+//   (ou de uma abelha apanhar o bloco com a chave escondida).
+// - Peças com gelo / corrente / a dormir só se podem tocar quando a condição delas se cumprir.
 // - Tudo é guiado por eventos com tempo exato, por isso o resultado não depende dos fps.
 import { Rng } from './rng';
-import { charColor, type LevelData, type LockDef, type PieceDef } from './types';
+import { charColor, isCellLock, type LevelData, type LockDef, type PieceDef } from './types';
 
 export const DEFAULT_SLOTS = 5;
 export const MAX_SLOTS = 7;
@@ -38,7 +40,16 @@ export interface RPiece {
   tubeChild: number;
   tubeParent: number;
   hidden: boolean;
+  /** Gelo: peças completas precisas (0 = sem gelo) */
+  ice: number;
+  /** Corrente: id da peça que tem de entrar primeiro (-1 = sem corrente) */
+  chain: number;
+  /** A dormir até esta cor ser toda recolhida (-1 = acordada) */
+  wait: number;
 }
+
+/** Porque é que uma peça ainda não se pode tocar. */
+export type Gate = 'frozen' | 'chained' | 'asleep';
 
 export interface Bee {
   id: number;
@@ -73,7 +84,7 @@ export type EngineEvent =
   | { type: 'shuffle' }
   | { type: 'slotAdded'; slots: number };
 
-export type TapCheck = 'ok' | 'empty' | 'tube' | 'twinNotFront' | 'noSpace' | 'locked';
+export type TapCheck = 'ok' | 'empty' | 'tube' | 'twinNotFront' | 'noSpace' | 'locked' | Gate;
 
 const EV_LAUNCH = 0;
 const EV_PICKUP = 1;
@@ -112,6 +123,10 @@ export class GameEngine {
   locks: LockDef[] = [];
   lockOpen: Uint8Array = new Uint8Array(0);
   lockOfColor: Int8Array = new Int8Array(0);
+  /** Célula da chave escondida de cada cadeado (-1 = chave por blocos de uma cor) */
+  lockCell: Int32Array = new Int32Array(0);
+  /** Peças completas no nível (para o gelo) */
+  piecesDone = 0;
   /** Blocos de cada cor no início do nível */
   colorTotal: Int32Array = new Int32Array(0);
   colorRemaining: Int32Array;
@@ -157,6 +172,8 @@ export class GameEngine {
       this.locks = clone.locks; // imutável
       this.lockOpen = clone.lockOpen.slice();
       this.lockOfColor = clone.lockOfColor; // imutável
+      this.lockCell = clone.lockCell; // imutável
+      this.piecesDone = clone.piecesDone;
       this.colorTotal = clone.colorTotal; // imutável
       this.colorRemaining = clone.colorRemaining.slice();
       this.blocksLeft = clone.blocksLeft;
@@ -261,6 +278,7 @@ export class GameEngine {
     this.lockOpen = new Uint8Array(this.locks.length);
     this.lockOfColor = new Int8Array(this.colorCount).fill(-1);
     this.locks.forEach((l, k) => (this.lockOfColor[l.c] = k));
+    this.lockCell = Int32Array.from(this.locks.map((l) => (isCellLock(l) ? l.y * w + l.x : -1)));
 
     // Distâncias à entrada da colmeia (por baixo do quadro, ao centro)
     const hx = (w - 1) / 2;
@@ -297,6 +315,9 @@ export class GameEngine {
           tubeChild: p.tube ?? -1,
           tubeParent: -1,
           hidden: !!p.hidden,
+          ice: p.ice ?? 0,
+          chain: p.chain ?? -1,
+          wait: p.wait ?? -1,
         });
       }
     }
@@ -386,10 +407,28 @@ export class GameEngine {
     return p.remaining - p.inFlight;
   }
 
-  /** Blocos da cor da chave já recolhidos para o cadeado k. */
+  /** Quanto falta para a chave do cadeado k: progresso atual e total (chave escondida = 0/1). */
   keyProgress(k: number): number {
     const l = this.locks[k];
+    if (isCellLock(l)) return this.lockOpen[k];
     return Math.min(l.n, this.colorTotal[l.key] - this.colorRemaining[l.key]);
+  }
+
+  keyNeed(k: number): number {
+    const l = this.locks[k];
+    return isCellLock(l) ? 1 : l.n;
+  }
+
+  /** Condição ainda por cumprir (gelo, corrente ou a dormir) ou null se a peça está livre. */
+  gateOf(p: RPiece): Gate | null {
+    if (p.ice > this.piecesDone) return 'frozen';
+    if (p.chain >= 0 && this.columnOf(p.chain) >= 0) return 'chained';
+    if (p.wait >= 0 && this.colorRemaining[p.wait] > 0) return 'asleep';
+    return null;
+  }
+
+  iceLeft(p: RPiece): number {
+    return Math.max(0, p.ice - this.piecesDone);
   }
 
   /** A peça é de uma cor com cadeado ainda fechado? */
@@ -417,6 +456,8 @@ export class GameEngine {
     const p = this.pieces.get(front)!;
     if (p.tubeParent >= 0) return 'tube';
     if (this.isLocked(p) || (p.twin >= 0 && this.isLocked(this.pieces.get(p.twin)!))) return 'locked';
+    const gate = this.gateOf(p) ?? (p.twin >= 0 ? this.gateOf(this.pieces.get(p.twin)!) : null);
+    if (gate) return gate;
     const free = this.freeSlots();
     if (p.twin >= 0) {
       if (!this.columns.some((c, i) => i !== col && c[0] === p.twin)) return 'twinNotFront';
@@ -470,6 +511,9 @@ export class GameEngine {
       tubeChild: -1,
       tubeParent,
       hidden: false,
+      ice: 0,
+      chain: -1,
+      wait: -1,
     };
     this.pieces.set(p.id, p);
     if (tubeParent >= 0) this.pieces.get(tubeParent)!.tubeChild = p.id;
@@ -497,6 +541,7 @@ export class GameEngine {
     const p = this.pieces.get(pieceId);
     if (!p || this.columnOf(pieceId) < 0) return false;
     if (this.isLocked(p) || (p.twin >= 0 && this.isLocked(this.pieces.get(p.twin)!))) return false;
+    if (this.gateOf(p) || (p.twin >= 0 && this.gateOf(this.pieces.get(p.twin)!))) return false;
     const need = p.twin >= 0 && this.columnOf(p.twin) >= 0 ? 2 : 1;
     return this.freeSlots() >= need;
   }
@@ -563,6 +608,7 @@ export class GameEngine {
         if (p.remaining > 0) continue;
         this.unlink(p);
         this.columns[c].splice(this.columns[c].indexOf(id), 1);
+        this.piecesDone++;
         this.emit({ type: 'columnRemove', pieceId: id, col: c });
       }
     }
@@ -581,10 +627,13 @@ export class GameEngine {
   shuffleColumns(rng: Rng = this.rng): void {
     const positions: [number, number][] = [];
     const ids: number[] = [];
+    // peças com gelo/corrente/a dormir (e as que seguram correntes) ficam no sítio
+    const anchored = new Set<number>();
+    for (const p of this.pieces.values()) if (p.chain >= 0) anchored.add(p.chain);
     this.columns.forEach((col, c) =>
       col.forEach((id, d) => {
         const p = this.pieces.get(id)!;
-        if (p.twin < 0 && p.tubeChild < 0 && p.tubeParent < 0) {
+        if (p.twin < 0 && p.tubeChild < 0 && p.tubeParent < 0 && p.ice === 0 && p.chain < 0 && p.wait < 0 && !anchored.has(id)) {
           positions.push([c, d]);
           ids.push(id);
         }
@@ -665,6 +714,7 @@ export class GameEngine {
     const id = this.slots[slot];
     const p = this.pieces.get(id)!;
     this.slots[slot] = -1;
+    this.piecesDone++;
     this.emit({ type: 'pieceDone', pieceId: id, slot });
     if (p.twin >= 0) {
       const t = this.pieces.get(p.twin);
@@ -838,8 +888,10 @@ export class GameEngine {
       }
     }
     for (let k = 0; k < this.locks.length; k++) {
-      if (this.lockOpen[k] || this.locks[k].key !== c) continue;
-      if (this.colorTotal[c] - this.colorRemaining[c] >= this.locks[k].n) {
+      if (this.lockOpen[k]) continue;
+      const l = this.locks[k];
+      const open = isCellLock(l) ? this.lockCell[k] === i : l.key === c && this.colorTotal[c] - this.colorRemaining[c] >= l.n;
+      if (open) {
         this.lockOpen[k] = 1;
         this.emit({ type: 'lockOpen', lock: k });
       }

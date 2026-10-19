@@ -1,6 +1,6 @@
 // Validação estrutural de um nível (inclui a invariante de contagem por cor).
 import { PALETTE_BY_ID } from './palette';
-import { charColor, type LevelData } from './types';
+import { charColor, isCellLock, type LevelData, type PieceDef } from './types';
 
 export const COLUMN_COUNT = 4;
 
@@ -104,16 +104,52 @@ export function validateLevel(level: LevelData): string[] {
   });
   // cadeados: cor válida, chave de outra cor, sem cadeias, e peças da cor sem gémeas/tubos
   const locked = new Set<number>();
-  const childOf = new Set(level.columns.flat().filter((p) => p.tube !== undefined).map((p) => p.tube));
+  const allPieces = level.columns.flat();
+  const childOf = new Set(allPieces.filter((p) => p.tube !== undefined).map((p) => p.tube));
+  const linked = (p: PieceDef) => p.twin !== undefined || p.tube !== undefined || childOf.has(p.id);
+  const validColor = (c: number) => Number.isInteger(c) && c >= 0 && c < level.colors.length;
   for (const l of level.locks ?? []) {
-    if (l.c < 0 || l.c >= level.colors.length || l.key < 0 || l.key >= level.colors.length) err('cadeado com cor inválida');
-    if (l.c === l.key) err('cadeado aberto pela própria cor');
+    if (!validColor(l.c)) err('cadeado com cor inválida');
     if (locked.has(l.c)) err('duas fechaduras na mesma cor');
     locked.add(l.c);
-    if (l.n <= 0 || l.n > (blocks[l.key] ?? 0)) err(`cadeado pede ${l.n} blocos da chave mas só há ${blocks[l.key]}`);
-    for (const p of level.columns.flat())
-      if (p.c === l.c && (p.twin !== undefined || p.tube !== undefined || childOf.has(p.id))) err(`peça ${p.id} com cadeado não pode ser gémea nem tubo`);
+    if (isCellLock(l)) {
+      const c = cellAt(l.x, l.y);
+      if (c < 0) err(`chave escondida numa célula vazia (${l.x},${l.y})`);
+      if (special.has(`${l.x},${l.y}`) || boxAt.has(`${l.x},${l.y}`)) err('chave escondida debaixo de pedra, flor ou caixa');
+      if (c === l.c) err('chave escondida num bloco da própria cor fechada');
+    } else {
+      if (!validColor(l.key)) err('cadeado com cor de chave inválida');
+      if (l.c === l.key) err('cadeado aberto pela própria cor');
+      if (l.n <= 0 || l.n > (blocks[l.key] ?? 0)) err(`cadeado pede ${l.n} blocos da chave mas só há ${blocks[l.key]}`);
+    }
+    for (const p of allPieces) if (p.c === l.c && linked(p)) err(`peça ${p.id} com cadeado não pode ser gémea nem tubo`);
   }
-  for (const l of level.locks ?? []) if (locked.has(l.key)) err('a cor da chave também está fechada (cadeia de cadeados)');
+  for (const l of level.locks ?? []) {
+    const keyColor = isCellLock(l) ? cellAt(l.x, l.y) : l.key;
+    if (locked.has(keyColor)) err('a cor da chave também está fechada (cadeia de cadeados)');
+  }
+  // gelo, corrente e a dormir: só em peças soltas (sem gémeas nem tubos), sem ciclos de correntes
+  const colOf = new Map<number, number>();
+  level.columns.forEach((col, ci) => col.forEach((p) => colOf.set(p.id, ci)));
+  const byId = new Map(allPieces.map((p) => [p.id, p]));
+  for (const p of allPieces) {
+    const gated = p.ice !== undefined || p.chain !== undefined || p.wait !== undefined;
+    if (gated && linked(p)) err(`peça ${p.id} com gelo/corrente/a dormir não pode ser gémea nem tubo`);
+    if (p.ice !== undefined && (!Number.isInteger(p.ice) || p.ice < 1 || p.ice >= allPieces.length)) err(`peça ${p.id} com gelo inválido`);
+    if (p.wait !== undefined && (!validColor(p.wait) || p.wait === p.c)) err(`peça ${p.id} a dormir com cor inválida`);
+    if (p.chain !== undefined) {
+      if (!byId.has(p.chain) || p.chain === p.id) err(`peça ${p.id} com corrente para peça inexistente`);
+      else if (colOf.get(p.chain) === colOf.get(p.id)) err(`corrente da peça ${p.id} na mesma coluna`);
+      // seguir as correntes não pode voltar à mesma peça
+      const seen = new Set([p.id]);
+      for (let q = byId.get(p.chain); q?.chain !== undefined; q = byId.get(q.chain)) {
+        if (seen.has(q.id)) {
+          err(`ciclo de correntes na peça ${p.id}`);
+          break;
+        }
+        seen.add(q.id);
+      }
+    }
+  }
   return errors;
 }
