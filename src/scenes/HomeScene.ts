@@ -70,8 +70,9 @@ export class HomeScene extends BaseScene {
     // só na página web de testes (npm run build:web): atalhos para experimentar os desafios novos
     // (dentro do if para a build de lançamento não levar este código)
     if (import.meta.env.MODE === 'web') {
-      [81, 101, 104].forEach((n, i) => {
-        new Button(this, L.W / 2 + (i - 1) * 156, 150, {
+      // 104: caixas + cadeado; 121: gelo; 141: chave escondida; 196: corrente, a dormir e mais
+      [104, 121, 141, 196].forEach((n, i) => {
+        new Button(this, L.W / 2 + (i - 1.5) * 160, 150, {
           w: 148,
           h: 54,
           color: COLORS.glass,
