@@ -9,12 +9,12 @@ Gerado por `npm run levels:report`.
 | Etiqueta | Níveis |
 |---|---|
 | Normal | 241 |
-| Difícil | 31 |
-| Muito difícil | 28 |
+| Difícil | 32 |
+| Muito difícil | 27 |
 
 - Todos os 300 níveis são resolúveis com 5 ranhuras (a solução está guardada e é testada).
 - Normal: a estratégia gulosa ganha. Difícil: a gulosa perde e 35-74% dos jogos aleatórios perdem. Muito difícil: a gulosa perde e 75%+ dos jogos aleatórios perdem.
-- Níveis que não atingiram a dificuldade pretendida (ficaram com a etiqueta real medida): 70 (pretendido Muito difícil, ficou Normal).
+- Níveis que não atingiram a dificuldade pretendida (ficaram com a etiqueta real medida): 70 (pretendido Muito difícil, ficou Normal), 210 (pretendido Muito difícil, ficou Difícil).
 
 ## Por dezena
 
@@ -40,14 +40,14 @@ Gerado por `npm run levels:report`.
 | 171-180 | 30x33 | 999 | 44 | 8 | 1 | 1 |
 | 181-190 | 31x34 | 1059 | 47 | 8 | 1 | 1 |
 | 191-200 | 32x34 | 1084 | 48 | 8 | 1 | 1 |
-| 201-210 | 33x35 | 1158 | 51 | 8 | 1 | 1 |
+| 201-210 | 33x35 | 1158 | 50 | 8 | 2 | 0 |
 | 211-220 | 34x36 | 1226 | 52 | 8 | 1 | 1 |
 | 221-230 | 35x38 | 1331 | 55 | 8 | 1 | 1 |
 | 231-240 | 35x39 | 1366 | 57 | 8 | 1 | 1 |
 | 241-250 | 36x40 | 1434 | 59 | 8 | 1 | 1 |
 | 251-260 | 37x41 | 1501 | 60 | 8 | 1 | 1 |
 | 261-270 | 37x41 | 1536 | 62 | 8 | 1 | 1 |
-| 271-280 | 38x42 | 1632 | 63 | 8 | 1 | 1 |
+| 271-280 | 38x42 | 1632 | 62 | 8 | 1 | 1 |
 | 281-290 | 39x43 | 1696 | 61 | 8 | 1 | 1 |
 | 291-300 | 39x43 | 1696 | 59 | 8 | 1 | 1 |
 
@@ -180,11 +180,11 @@ Gerado por `npm run levels:report`.
 | 123 | uvas | 24x24 | 3 | 23 | Normal | sim | 0% | gémeas, tubos, escondidas, flores |
 | 124 | lua | 28x30 | 3 | 31 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
 | 125 | arvore | 24x24 | 4 | 24 | Normal | sim | 0% | gémeas, tubos, escondidas |
-| 126 | cabana | 28x30 | 6 | 46 | Difícil | não | 46% | gémeas, escondidas |
+| 126 | cabana | 28x30 | 6 | 46 | Difícil | não | 50% | gémeas, escondidas |
 | 127 | chapeu-chuva | 28x30 | 5 | 31 | Normal | sim | 0% | gémeas, tubos, escondidas |
 | 128 | colmeia | 24x24 | 4 | 25 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 129 | cogumelo | 24x24 | 4 | 23 | Normal | sim | 0% | gémeas, escondidas, flores |
-| 130 | lotus | 28x30 | 5 | 47 | Muito difícil | não | 92% | gémeas, tubos, escondidas |
+| 130 | lotus | 28x30 | 5 | 47 | Muito difícil | não | 88% | gémeas, tubos, escondidas |
 | 131 | sapo | 28x30 | 4 | 31 | Normal | sim | 13% | gémeas, tubos, escondidas, flores |
 | 132 | abelha | 28x30 | 4 | 33 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
 | 133 | maca | 28x30 | 5 | 32 | Normal | sim | 4% | gémeas, tubos, pedras, escondidas |
@@ -194,15 +194,15 @@ Gerado por `npm run levels:report`.
 | 137 | melancia | 24x24 | 4 | 22 | Normal | sim | 0% | gémeas, pedras, escondidas, flores |
 | 138 | chupa | 24x24 | 3 | 22 | Normal | sim | 0% | gémeas, pedras, escondidas, flores |
 | 139 | arco-iris | 28x30 | 8 | 34 | Normal | sim | 42% | gémeas, escondidas |
-| 140 | laranja | 32x34 | 4 | 73 | Muito difícil | não | 100% | gémeas, tubos, pedras, escondidas, flores |
-| 141 | passaro | 28x30 | 6 | 34 | Normal | sim | 17% | gémeas, escondidas |
+| 140 | laranja | 32x34 | 4 | 73 | Muito difícil | não | 96% | gémeas, tubos, pedras, escondidas, flores |
+| 141 | passaro | 28x30 | 6 | 34 | Normal | sim | 54% | gémeas, escondidas |
 | 142 | borboleta | 24x24 | 5 | 22 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
 | 143 | pote-mel | 24x24 | 4 | 24 | Normal | sim | 0% | gémeas, pedras, escondidas |
 | 144 | bolo | 28x30 | 5 | 35 | Normal | sim | 38% | gémeas, tubos, pedras, escondidas, flores |
 | 145 | rebucado | 28x30 | 4 | 32 | Normal | sim | 4% | gémeas, tubos, pedras, escondidas, flores |
 | 146 | ananas | 28x30 | 4 | 46 | Difícil | não | 38% | gémeas, tubos, pedras, escondidas, flores |
 | 147 | gato | 28x30 | 4 | 36 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
-| 148 | peixe | 28x30 | 4 | 38 | Normal | sim | 13% | gémeas, tubos, escondidas |
+| 148 | peixe | 28x30 | 4 | 38 | Normal | sim | 0% | gémeas, tubos, escondidas |
 | 149 | cerejas | 28x30 | 4 | 33 | Normal | sim | 0% | gémeas, tubos, escondidas, flores |
 | 150 | folha-outono | 32x34 | 3 | 63 | Muito difícil | não | 79% | gémeas, tubos, escondidas |
 | 151 | caracol | 24x24 | 4 | 25 | Normal | sim | 13% | gémeas, tubos, escondidas, flores |
@@ -214,17 +214,17 @@ Gerado por `npm run levels:report`.
 | 157 | bolo | 28x30 | 5 | 33 | Normal | sim | 13% | gémeas, tubos, pedras, escondidas |
 | 158 | girassol | 28x30 | 5 | 34 | Normal | sim | 0% | gémeas, tubos, escondidas |
 | 159 | chupa | 28x30 | 3 | 34 | Normal | sim | 0% | gémeas, tubos, escondidas |
-| 160 | maca | 32x34 | 5 | 67 | Muito difícil | não | 83% | gémeas, tubos, escondidas, flores |
-| 161 | passaro | 28x30 | 6 | 35 | Normal | sim | 8% | gémeas, tubos, pedras, escondidas |
+| 160 | maca | 32x34 | 5 | 67 | Muito difícil | não | 88% | gémeas, tubos, escondidas, flores |
+| 161 | passaro | 28x30 | 6 | 35 | Normal | sim | 4% | gémeas, tubos, pedras, escondidas |
 | 162 | pote-mel | 28x30 | 4 | 33 | Normal | sim | 0% | gémeas, escondidas, flores |
 | 163 | ananas | 28x30 | 4 | 32 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
-| 164 | colmeia | 36x40 | 4 | 69 | Difícil | não | 54% | gémeas, tubos, escondidas, flores |
+| 164 | colmeia | 36x40 | 4 | 69 | Difícil | não | 42% | gémeas, tubos, escondidas, flores |
 | 165 | lotus | 28x30 | 5 | 32 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
 | 166 | lua | 28x30 | 3 | 35 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 167 | rebucado | 28x30 | 4 | 37 | Normal | sim | 8% | gémeas, tubos, escondidas, flores |
 | 168 | uvas | 28x30 | 4 | 33 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 169 | melancia | 28x30 | 5 | 34 | Normal | sim | 0% | gémeas, tubos, escondidas, flores |
-| 170 | cerejas | 32x34 | 4 | 71 | Muito difícil | não | 96% | tubos, pedras, escondidas, flores |
+| 170 | cerejas | 32x34 | 4 | 71 | Muito difícil | não | 83% | tubos, pedras, escondidas, flores |
 | 171 | queque | 32x34 | 5 | 46 | Normal | sim | 0% | gémeas, tubos, escondidas |
 | 172 | pera | 32x34 | 5 | 44 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 173 | morango | 28x30 | 4 | 36 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
@@ -237,7 +237,7 @@ Gerado por `npm run levels:report`.
 | 180 | favos | 36x40 | 2 | 87 | Muito difícil | não | 79% | gémeas, tubos, pedras, escondidas |
 | 181 | abelha | 32x34 | 4 | 42 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 182 | rosa | 28x30 | 4 | 35 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
-| 183 | sol | 28x30 | 5 | 33 | Normal | sim | 8% | gémeas, tubos, escondidas |
+| 183 | sol | 28x30 | 5 | 33 | Normal | sim | 0% | gémeas, tubos, escondidas |
 | 184 | bolacha | 36x40 | 3 | 72 | Difícil | não | 63% | gémeas, tubos, pedras, escondidas |
 | 185 | laranja | 28x30 | 4 | 31 | Normal | sim | 0% | gémeas, pedras, escondidas |
 | 186 | vaso | 28x30 | 8 | 34 | Normal | sim | 25% | gémeas, tubos, pedras, escondidas |
@@ -254,17 +254,17 @@ Gerado por `npm run levels:report`.
 | 197 | chapeu-chuva | 32x34 | 5 | 41 | Normal | sim | 38% | gémeas, tubos, pedras, escondidas, flores |
 | 198 | boneco-neve | 32x34 | 4 | 43 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 199 | tulipa | 32x34 | 4 | 44 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
-| 200 | arvore | 36x40 | 4 | 91 | Muito difícil | não | 75% | gémeas, tubos, escondidas, flores |
+| 200 | arvore | 36x40 | 4 | 91 | Muito difícil | não | 83% | gémeas, tubos, escondidas, flores |
 | 201 | borboleta | 32x34 | 5 | 42 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
 | 202 | queque | 32x34 | 5 | 42 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
 | 203 | abelha | 32x34 | 4 | 42 | Normal | sim | 21% | gémeas, tubos, pedras, escondidas, flores |
-| 204 | rosa | 32x34 | 4 | 42 | Normal | sim | 4% | gémeas, tubos, pedras, escondidas, flores |
+| 204 | rosa | 32x34 | 4 | 42 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 205 | favos | 36x40 | 2 | 74 | Difícil | não | 71% | gémeas, tubos, escondidas |
 | 206 | lotus | 32x34 | 5 | 47 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 207 | vaso | 32x34 | 8 | 46 | Normal | sim | 29% | gémeas, tubos, escondidas, flores |
 | 208 | cerejas | 32x34 | 4 | 40 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
 | 209 | laranja | 32x34 | 4 | 41 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
-| 210 | maca | 36x40 | 5 | 91 | Muito difícil | não | 88% | gémeas, tubos, pedras, escondidas |
+| 210 | maca | 36x40 | 5 | 87 | Difícil | não | 58% | gémeas, tubos, escondidas, flores |
 | 211 | malmequer | 36x40 | 5 | 53 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
 | 212 | girassol | 32x34 | 5 | 43 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 213 | chapeu-chuva | 32x34 | 5 | 41 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
@@ -282,15 +282,15 @@ Gerado por `npm run levels:report`.
 | 225 | peixe | 36x40 | 5 | 76 | Difícil | não | 54% | gémeas, tubos, pedras, escondidas |
 | 226 | pera | 32x34 | 5 | 45 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
 | 227 | lavanda | 36x40 | 5 | 56 | Normal | sim | 29% | gémeas, tubos, pedras, escondidas |
-| 228 | mocho | 32x34 | 5 | 43 | Normal | sim | 17% | gémeas, tubos, escondidas, flores |
+| 228 | mocho | 32x34 | 5 | 43 | Normal | sim | 8% | gémeas, tubos, escondidas, flores |
 | 229 | melancia | 36x40 | 5 | 56 | Normal | sim | 0% | gémeas, tubos, escondidas |
-| 230 | sol | 40x44 | 5 | 88 | Muito difícil | não | 83% | gémeas, tubos, pedras, escondidas, flores |
-| 231 | cogumelo | 32x34 | 4 | 43 | Normal | sim | 4% | gémeas, tubos, escondidas, flores |
+| 230 | sol | 40x44 | 5 | 88 | Muito difícil | não | 96% | gémeas, tubos, pedras, escondidas, flores |
+| 231 | cogumelo | 32x34 | 4 | 43 | Normal | sim | 8% | gémeas, tubos, escondidas, flores |
 | 232 | lua | 36x40 | 3 | 56 | Normal | sim | 0% | gémeas, tubos, escondidas |
 | 233 | bolacha | 36x40 | 3 | 54 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
 | 234 | floco | 32x34 | 3 | 42 | Normal | sim | 0% | gémeas, tubos, escondidas, flores |
-| 235 | arco-iris | 32x34 | 8 | 45 | Normal | sim | 8% | gémeas, tubos, escondidas, flores |
-| 236 | tulipa | 36x40 | 4 | 73 | Difícil | não | 42% | gémeas, tubos, escondidas |
+| 235 | arco-iris | 32x34 | 8 | 45 | Normal | sim | 13% | gémeas, tubos, escondidas, flores |
+| 236 | tulipa | 36x40 | 4 | 73 | Difícil | não | 67% | gémeas, tubos, escondidas, flores |
 | 237 | folha-outono | 36x40 | 3 | 55 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 238 | limao | 36x40 | 4 | 54 | Normal | sim | 13% | gémeas, tubos, pedras, escondidas |
 | 239 | morango | 36x40 | 4 | 61 | Normal | sim | 0% | gémeas, tubos, escondidas, flores |
@@ -299,32 +299,32 @@ Gerado por `npm run levels:report`.
 | 242 | arvore | 36x40 | 4 | 58 | Normal | sim | 13% | gémeas, tubos, escondidas |
 | 243 | joaninha | 32x34 | 4 | 50 | Normal | sim | 8% | gémeas, tubos, escondidas, flores |
 | 244 | colmeia | 32x34 | 4 | 40 | Normal | sim | 0% | gémeas, tubos, escondidas, flores |
-| 245 | uvas | 40x44 | 5 | 77 | Difícil | não | 38% | gémeas, tubos, escondidas |
+| 245 | uvas | 40x44 | 5 | 77 | Difícil | não | 46% | gémeas, tubos, escondidas |
 | 246 | limao | 36x40 | 4 | 52 | Normal | sim | 0% | gémeas, tubos, escondidas, flores |
 | 247 | laranja | 36x40 | 4 | 59 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
-| 248 | abelha | 36x40 | 4 | 55 | Normal | sim | 50% | gémeas, tubos, pedras, escondidas |
+| 248 | abelha | 36x40 | 4 | 55 | Normal | sim | 17% | gémeas, tubos, pedras, escondidas |
 | 249 | chupa | 36x40 | 3 | 56 | Normal | sim | 8% | gémeas, tubos, escondidas |
 | 250 | cabana | 40x44 | 6 | 88 | Muito difícil | não | 100% | gémeas, tubos, escondidas, flores |
-| 251 | melancia | 32x34 | 5 | 46 | Normal | sim | 4% | gémeas, tubos, escondidas |
+| 251 | melancia | 32x34 | 5 | 46 | Normal | sim | 8% | gémeas, tubos, escondidas |
 | 252 | maca | 36x40 | 5 | 55 | Normal | sim | 0% | gémeas, tubos, escondidas, flores |
 | 253 | sapo | 36x40 | 5 | 55 | Normal | sim | 25% | gémeas, tubos, escondidas, flores |
-| 254 | bolo | 36x40 | 6 | 59 | Normal | sim | 33% | gémeas, tubos, escondidas |
+| 254 | bolo | 36x40 | 6 | 59 | Normal | sim | 13% | gémeas, tubos, escondidas |
 | 255 | uvas | 40x44 | 5 | 75 | Difícil | não | 58% | gémeas, tubos, escondidas, flores |
 | 256 | folha-outono | 40x44 | 3 | 57 | Normal | sim | 4% | gémeas, tubos, escondidas |
 | 257 | gato | 36x40 | 4 | 55 | Normal | sim | 0% | gémeas, tubos, escondidas |
 | 258 | caracol | 36x40 | 4 | 53 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
-| 259 | rosa | 36x40 | 4 | 55 | Normal | sim | 29% | gémeas, tubos, pedras, escondidas |
+| 259 | rosa | 36x40 | 4 | 55 | Normal | sim | 4% | gémeas, tubos, pedras, escondidas |
 | 260 | cerejas | 40x44 | 4 | 93 | Muito difícil | não | 100% | gémeas, tubos, pedras, escondidas |
 | 261 | colmeia | 36x40 | 4 | 58 | Normal | sim | 0% | gémeas, tubos, escondidas |
 | 262 | lua | 36x40 | 3 | 52 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 263 | pote-mel | 36x40 | 4 | 57 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 264 | rebucado | 40x44 | 4 | 52 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
-| 265 | tulipa | 40x44 | 4 | 76 | Difícil | não | 54% | gémeas, tubos, pedras, escondidas, flores |
+| 265 | tulipa | 40x44 | 4 | 76 | Difícil | não | 38% | gémeas, tubos, pedras, escondidas, flores |
 | 266 | boneco-neve | 36x40 | 4 | 59 | Normal | sim | 4% | gémeas, tubos, escondidas, flores |
-| 267 | lotus | 36x40 | 5 | 57 | Normal | sim | 46% | gémeas, tubos, pedras, escondidas, flores |
+| 267 | lotus | 36x40 | 5 | 57 | Normal | sim | 50% | gémeas, tubos, pedras, escondidas, flores |
 | 268 | ananas | 36x40 | 4 | 59 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 269 | joaninha | 36x40 | 4 | 57 | Normal | sim | 0% | gémeas, tubos, escondidas |
-| 270 | donut | 40x44 | 3 | 90 | Muito difícil | não | 100% | gémeas, tubos, pedras, escondidas |
+| 270 | donut | 40x44 | 3 | 90 | Muito difícil | não | 92% | gémeas, tubos, pedras, escondidas |
 | 271 | chapeu-chuva | 36x40 | 6 | 56 | Normal | sim | 8% | gémeas, tubos, escondidas, flores |
 | 272 | mocho | 40x44 | 5 | 56 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
 | 273 | malmequer | 40x44 | 5 | 58 | Normal | sim | 13% | gémeas, tubos, pedras, escondidas |
@@ -334,11 +334,11 @@ Gerado por `npm run levels:report`.
 | 277 | favos | 36x40 | 2 | 58 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
 | 278 | cogumelo | 40x44 | 4 | 60 | Normal | sim | 17% | gémeas, tubos, escondidas, flores |
 | 279 | queque | 40x44 | 5 | 56 | Normal | sim | 29% | gémeas, tubos, escondidas |
-| 280 | bolacha | 40x44 | 3 | 89 | Muito difícil | não | 100% | gémeas, tubos, pedras, escondidas, flores |
-| 281 | sol | 40x44 | 5 | 54 | Normal | sim | 8% | gémeas, tubos, pedras, escondidas, flores |
+| 280 | bolacha | 40x44 | 3 | 84 | Muito difícil | não | 88% | gémeas, tubos, escondidas, flores |
+| 281 | sol | 40x44 | 5 | 54 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 282 | lavanda | 40x44 | 5 | 57 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
 | 283 | gelado | 36x40 | 6 | 55 | Normal | sim | 21% | gémeas, tubos, pedras, escondidas |
-| 284 | morango | 40x44 | 4 | 74 | Difícil | não | 21% | gémeas, tubos, escondidas, flores |
+| 284 | morango | 40x44 | 4 | 74 | Difícil | não | 42% | gémeas, tubos, pedras, escondidas |
 | 285 | girassol | 36x40 | 5 | 59 | Normal | sim | 4% | gémeas, tubos, pedras, escondidas, flores |
 | 286 | arvore | 40x44 | 4 | 56 | Normal | sim | 4% | gémeas, tubos, pedras, escondidas, flores |
 | 287 | pera | 40x44 | 5 | 55 | Normal | sim | 0% | gémeas, tubos, escondidas, flores |
@@ -350,8 +350,8 @@ Gerado por `npm run levels:report`.
 | 293 | caracol | 36x40 | 4 | 56 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
 | 294 | uvas | 40x44 | 5 | 52 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas |
 | 295 | pote-mel | 40x44 | 4 | 53 | Normal | sim | 0% | gémeas, tubos, pedras, escondidas, flores |
-| 296 | girassol | 40x44 | 5 | 71 | Difícil | não | 54% | gémeas, tubos, escondidas, flores |
+| 296 | girassol | 40x44 | 5 | 71 | Difícil | não | 63% | gémeas, tubos, escondidas, flores |
 | 297 | gelado | 40x44 | 6 | 56 | Normal | sim | 8% | gémeas, tubos, escondidas |
 | 298 | donut | 40x44 | 3 | 55 | Normal | sim | 8% | gémeas, tubos, pedras, escondidas |
 | 299 | sol | 40x44 | 5 | 54 | Normal | sim | 0% | gémeas, tubos, escondidas, flores |
-| 300 | queque | 40x44 | 5 | 85 | Muito difícil | não | 75% | gémeas, tubos, pedras, escondidas |
+| 300 | queque | 40x44 | 5 | 85 | Muito difícil | não | 83% | gémeas, tubos, pedras, escondidas |

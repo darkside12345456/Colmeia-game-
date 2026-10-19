@@ -30,6 +30,10 @@ export interface Obstacles {
   flowers: boolean;
   boxes: boolean;
   locks: boolean;
+  ice: boolean;
+  keyCell: boolean;
+  chains: boolean;
+  wait: boolean;
 }
 
 /** Obstáculos que podem aparecer em cada nível (secção 2.3). O 1.º nível de cada um tem-no sempre. */
@@ -42,6 +46,10 @@ export function obstaclesFor(levelId: number): Obstacles {
     flowers: levelId >= 61,
     boxes: levelId >= 81,
     locks: levelId >= 101,
+    ice: levelId >= 121,
+    keyCell: levelId >= 141,
+    chains: levelId >= 161,
+    wait: levelId >= 181,
   };
 }
 
@@ -276,6 +284,108 @@ export function chooseLock(level: LevelData, rng: Rng): LockDef | null {
   return { c: o.c, key: o.key, n: rng.int(Math.max(5, Math.round(hi * 0.5)), hi) };
 }
 
+interface TraceStep {
+  /** Peças que entram na bandeja com este toque (a da frente e a gémea) */
+  entered: number[];
+  /** Peças completas antes do toque */
+  done: number;
+  /** Cores já todas recolhidas antes do toque */
+  cleared: number[];
+  /** Quantos blocos já tinham saído do quadro antes do toque */
+  removed: number;
+}
+
+/** Repete a solução e regista, antes de cada toque, o estado que interessa aos desafios. */
+export function traceSolution(level: LevelData): { steps: TraceStep[]; order: number[] } {
+  const e = new GameEngine(level, DEFAULT_SLOTS);
+  const order: number[] = [];
+  const steps: TraceStep[] = [];
+  const collect = () => {
+    for (const ev of e.runToQuiescence()) {
+      if (ev.type === 'pickup') order.push(ev.cell);
+      else if (ev.type === 'magnet') order.push(...ev.cells);
+    }
+  };
+  for (const col of level.solution ?? []) {
+    collect();
+    const front = e.pieces.get(e.columns[col][0])!;
+    const cleared: number[] = [];
+    e.colorRemaining.forEach((n, c) => n === 0 && cleared.push(c));
+    steps.push({ entered: front.twin >= 0 ? [front.id, front.twin] : [front.id], done: e.piecesDone, cleared, removed: order.length });
+    e.tap(col);
+  }
+  collect();
+  return { steps, order };
+}
+
+/**
+ * Troca a chave por blocos por uma chave escondida num bloco que, na solução, sai do quadro
+ * antes de a cor fechada ser precisa (de preferência um dos últimos, mais para dentro).
+ */
+export function toCellLock(level: LevelData, lock: LockDef, rng: Rng): LockDef | null {
+  const { steps, order } = traceSolution(level);
+  const firstUse = steps.findIndex((s) => s.entered.some((id) => level.columns.flat().find((p) => p.id === id)?.c === lock.c));
+  if (firstUse < 0) return null;
+  const special = new Set([...(level.stones ?? []), ...(level.flowers ?? [])].map((o) => o.y * level.w + o.x));
+  for (const b of level.boxes ?? []) for (let y = b.y; y < b.y + b.h; y++) for (let x = b.x; x < b.x + b.w; x++) special.add(y * level.w + x);
+  const cand = order
+    .slice(0, steps[firstUse].removed)
+    .filter((i) => !special.has(i) && charColor(level.grid[(i / level.w) | 0][i % level.w]) !== lock.c);
+  if (cand.length < 4) return null;
+  const i = cand[rng.int(Math.floor(cand.length * 0.4), cand.length - 1)];
+  return { c: lock.c, x: i % level.w, y: (i / level.w) | 0 };
+}
+
+/**
+ * Gelo, corrente e a dormir em peças soltas. As condições são tiradas da solução (cumprem-se
+ * antes de a peça ser tocada nela), por isso o nível continua resolúvel.
+ */
+export function addGates(level: LevelData, rng: Rng, obstacles: Obstacles, force: { ice: boolean; chains: boolean; wait: boolean }): void {
+  const pieces = level.columns.flat();
+  const byId = new Map(pieces.map((p) => [p.id, p]));
+  const colOf = new Map<number, number>();
+  level.columns.forEach((col, ci) => col.forEach((p) => colOf.set(p.id, ci)));
+  const tubeKids = new Set(pieces.filter((p) => p.tube !== undefined).map((p) => p.tube));
+  const lockedColors = new Set((level.locks ?? []).map((l) => l.c));
+  const { steps } = traceSolution(level);
+  const stepOf = new Map<number, number>();
+  steps.forEach((s, k) => s.entered.forEach((id) => stepOf.set(id, k)));
+  const usedAsTarget = new Set<number>();
+  const free = (p: PieceDef) =>
+    p.twin === undefined && p.tube === undefined && !tubeKids.has(p.id) && p.ice === undefined && p.chain === undefined && p.wait === undefined && !lockedColors.has(p.c) && !usedAsTarget.has(p.id);
+  const pickPiece = (ok: (p: PieceDef, s: TraceStep, k: number) => boolean): PieceDef | null => {
+    const cand = pieces.filter((p) => free(p) && stepOf.has(p.id) && ok(p, steps[stepOf.get(p.id)!], stepOf.get(p.id)!));
+    return cand.length ? rng.pick(cand) : null;
+  };
+  if (obstacles.ice && (force.ice || rng.chance(0.55))) {
+    const count = rng.int(1, 2);
+    for (let k = 0; k < count; k++) {
+      const p = pickPiece((_, s) => s.done >= 1);
+      if (p) p.ice = rng.int(1, Math.min(3, steps[stepOf.get(p.id)!].done));
+    }
+  }
+  if (obstacles.chains && (force.chains || rng.chance(0.45))) {
+    const p = pickPiece((q, _, k) => k >= 2 && steps.slice(0, k).some((s) => s.entered.some((id) => colOf.get(id) !== colOf.get(q.id))));
+    if (p) {
+      const k = stepOf.get(p.id)!;
+      const targets = steps
+        .slice(0, k)
+        .flatMap((s) => s.entered)
+        .filter((id) => colOf.get(id) !== colOf.get(p.id) && byId.get(id)?.chain === undefined);
+      if (targets.length) {
+        // de preferência uma peça tocada pouco antes (a corrente nota-se)
+        const q = targets[rng.int(Math.max(0, targets.length - 3), targets.length - 1)];
+        p.chain = q;
+        usedAsTarget.add(q);
+      }
+    }
+  }
+  if (obstacles.wait && (force.wait || rng.chance(0.4))) {
+    const p = pickPiece((q, s) => s.cleared.some((c) => c !== q.c));
+    if (p) p.wait = rng.pick(steps[stepOf.get(p.id)!].cleared.filter((c) => c !== p.c));
+  }
+}
+
 function hardness(greedyWins: boolean, loss: number): number {
   return (greedyWins ? 0 : 1) + loss;
 }
@@ -381,10 +491,12 @@ export function generateLevel(params: GenParams): GenOutcome {
     const built = construct(base, rng, obstacles, { holdProb, holdFree, twinProb: 0.12, tubeProb: 0.1, avgPiece });
     if (!built) continue;
     const level: LevelData = { ...base, columns: built.columns, solution: built.solution };
-    if (obstacles.locks && (id === 101 || rng.chance(0.45))) {
-      const lock = chooseLock(level, rng);
+    if (obstacles.locks && (id === 101 || id === 141 || rng.chance(0.45))) {
+      let lock = chooseLock(level, rng);
+      if (lock && obstacles.keyCell && (id === 141 || rng.chance(0.5))) lock = toCellLock(level, lock, rng) ?? lock;
       if (lock) level.locks = [lock];
     }
+    if (obstacles.ice) addGates(level, rng, obstacles, { ice: id === 121, chains: id === 161, wait: id === 181 });
     const errors = validateLevel(level);
     if (errors.length) throw new Error(errors.join('\n'));
     if (!replay(level, built.solution)) throw new Error(`Nível ${id}: a solução construída não ganha (erro no gerador)`);
